@@ -1,3 +1,16 @@
+.idea
+build
+bin
+deps
+lib
+include/boost
+include/json
+
+*.cmake.txt
+
+# Prerequisites
+*.d
+
 # Compiled Object files
 *.slo
 *.lo
@@ -27,3 +40,6 @@
 *.exe
 *.out
 *.app
+
+.ycm_extra_conf.py
+*.pyc
