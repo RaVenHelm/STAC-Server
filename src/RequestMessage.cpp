@@ -1,0 +1,57 @@
+#include "RequestMessage.hpp"
+
+#include <iostream>
+
+std::tuple<bool, RequestType, std::smatch> match_string(std::string const& request)
+{
+	static const std::regex login_admin{ "^(LOGA)\\s+\"([A-z]+)\"\\s+\"(.+)\"$" };
+	static const std::regex login_user{ "^(LOGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"$" };
+	static const std::regex register_admin{ "^(REGA)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"$" };
+	static const std::regex register_user{ "^(REGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"$" };
+	static const std::regex logout{"^(LOGO)$"};
+
+	auto matches = std::smatch{};
+
+	if(std::regex_match(request, matches, login_admin))
+	{
+		return std::make_tuple(true, RequestType::login_admin, matches);
+	}
+	else if(std::regex_match(request, matches, login_user))
+	{
+		return std::make_tuple(true, RequestType::login_user, matches);
+	}
+	else if(std::regex_match(request, matches, register_admin))
+	{
+		return std::make_tuple(true, RequestType::register_admin, matches);
+	}
+	else if(std::regex_match(request, matches, register_user))
+	{
+		return std::make_tuple(true, RequestType::register_user, matches);
+	}
+	else if(std::regex_match(request, matches, logout))
+	{
+		return std::make_tuple(true, RequestType::logout, matches);
+	}
+	else
+	{
+		return std::make_tuple(false, RequestType::invalid, matches);
+	}
+}
+
+RequestMessage::RequestMessage(std::string message) throw()
+{
+	auto result = match_string(message);
+	if(!std::get<bool>(result))
+	{
+		throw std::runtime_error(std::string{"Could not parse message: "} + message);
+	}
+	else
+	{
+		m_request = std::get<RequestType>(result);
+		auto matches = std::get<std::smatch>(result);
+		for(unsigned i = 0; i < matches.size(); ++i)
+		{
+			std::cout << "Submatch: " << matches[i].str() << '\n';
+		}
+	}
+}

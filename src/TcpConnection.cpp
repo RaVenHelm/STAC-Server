@@ -1,7 +1,9 @@
 #include <algorithm>
 #include <iterator>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "TcpConnection.hpp"
+#include "RequestMessage.hpp"
 
 using stac::tcpip::TcpConnection;
 using stac::core::Worker;
@@ -35,9 +37,19 @@ void TcpConnection::read_complete(boost::system::error_code const &error, size_t
   std::string packet_string { iter, iter + bytes_transferred };
 
   // Work to do after reading
+	auto now = boost::posix_time::microsec_clock::local_time();
+	std::cout << '[' << now << "]\n";
   std::cout << "Message recieved from: " << m_socket.remote_endpoint().address().to_string() << '\n';
   std::cout << "Message size: " << bytes_transferred << '\n';
   std::cout << packet_string << '\n';
+	try
+	{
+		RequestMessage message{packet_string};
+	}
+	catch(std::runtime_error& err)
+	{
+		std::cerr << err.what() << '\n';
+	}
   send(packet_string);
 }
 

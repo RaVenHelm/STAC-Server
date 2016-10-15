@@ -43,6 +43,7 @@ public:
       m_signals(m_service),
       m_dbi(std::make_shared<DBI>())
   {
+		m_dbi->executeRaw("select 'Hola, Lola!' as _message;", "_message");
     this->m_signals.add(SIGINT);
     this->m_signals.add(SIGTERM);
 #if defined(SIGQUIT)
