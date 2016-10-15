@@ -46,10 +46,10 @@ void TcpConnection::read_complete(boost::system::error_code const &error, size_t
   try
   {
     RequestMessage message{packet_string};
-		message.perform_action([&](auto const& type, auto const& values){
-			(void)type;
-			std::cout << "Values received: " << values.size() << '\n';
-		});
+    message.perform_action([&](auto const& type, auto const& values){
+    (void)type;
+    std::cout << "Values received: " << values.size() << '\n';
+    });
   }
   catch(std::exception& err)
   {

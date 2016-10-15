@@ -55,6 +55,6 @@ RequestMessage::RequestMessage(std::string message)
       std::cout << "Submatch: " << matches[i].str() << '\n';
       values.push_back(matches[i].str());
     }
-		m_values = values;
+    m_values = values;
   }
 }
