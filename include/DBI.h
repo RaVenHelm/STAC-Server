@@ -30,10 +30,10 @@ private:
 public:
 
   //Creates the connection. The way this is setup allows simple connections to be opened by just doing object.function...
-  DBI(std::string const conStr   = "138.86.104.164:3306",
-      std::string const username = "SEClass",
-      std::string const password = "BearsRock",
-      std::string const schema   = "STACDB")
+  DBI(std::string const conStr,
+      std::string const username,
+      std::string const password,
+      std::string const schema)
     : driver(get_driver_instance())
   {
     con = std::shared_ptr<sql::Connection>(driver->connect(conStr, username, password));

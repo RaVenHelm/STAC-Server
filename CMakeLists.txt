@@ -8,10 +8,11 @@ include("Platform")
 include("ThirdParty")
 
 FILE(GLOB SOURCES "src/*")
+message(${STAC_MYSQL_LIBS})
 
 add_executable(stac-server main.cpp ${SOURCES})
 target_link_libraries(stac-server
   ${Boost_LIBRARIES}
   ${STAC_GCC_LIBS}
-  libmysqlcppconn.so
+  ${STAC_MYSQL_LIBS}
 )

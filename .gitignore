@@ -5,6 +5,7 @@ deps
 lib
 include/boost
 include/json
+*.conf
 
 *.cmake.txt
 

@@ -8,9 +8,12 @@
 #include <boost/shared_ptr.hpp>
 
 #include "TcpConnection.hpp"
+#include "DBConfig.hpp"
 #include "DBI.h"
 
 using boost::asio::ip::tcp;
+using stac::config::DBConfig;
+using stac::config::connection_string;
 using stac::db::DBI;
 using stac::db::print_sql_error;
 
@@ -23,7 +26,7 @@ class TcpServer
   using shared_handler_t = boost::shared_ptr<ConnectionHandler>;
 
   unsigned short m_port = 0;
-  unsigned int m_thread_count = 1;
+  unsigned m_thread_count = 1;
   std::vector<std::thread> m_thread_pool;
   boost::asio::io_service m_service;
   tcp::acceptor m_acceptor;
@@ -36,14 +39,14 @@ public:
 
   TcpServer &operator=(TcpServer const &) = delete;
 
-  TcpServer(unsigned int thread_count = 1)
+  TcpServer(DBConfig const& conf, unsigned thread_count = 1)
     : m_thread_count(thread_count),
       m_service(),
       m_acceptor(m_service),
       m_signals(m_service),
-      m_dbi(std::make_shared<DBI>())
+      m_dbi(std::make_shared<DBI>(connection_string(conf), conf.username, conf.password, conf.schema))
   {
-		m_dbi->executeRaw("select 'Hola, Lola!' as _message;", "_message");
+	m_dbi->executeRaw("select 'Hola, Lola!' as _message;", "_message");
     this->m_signals.add(SIGINT);
     this->m_signals.add(SIGTERM);
 #if defined(SIGQUIT)
@@ -52,7 +55,7 @@ public:
     handle_await_stop();
   }
 
-  void run(unsigned int port)
+  void run(unsigned port)
   {
     auto handler = boost::make_shared<ConnectionHandler>(m_service);
 
