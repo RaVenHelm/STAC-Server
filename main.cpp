@@ -16,6 +16,8 @@ int main() {
   } catch (std::exception& ex) {
     std::cerr << ex.what() << '\n';
     return 1;
-  }
+  } catch (...) {
+		std::cerr << "Uncaught error!\n";
+	}
   return 0;
 }

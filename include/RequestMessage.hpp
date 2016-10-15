@@ -24,7 +24,7 @@ class RequestMessage
 	RequestType m_request;
 	std::vector<std::string> m_values;
 public:
-	explicit RequestMessage(std::string message) throw();
+	explicit RequestMessage(std::string message);
 	RequestMessage() = delete;
 	RequestMessage(RequestMessage const&) = delete;
 	RequestMessage& operator=(RequestMessage const&) = delete;
