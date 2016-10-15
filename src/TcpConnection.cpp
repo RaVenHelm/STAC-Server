@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iterator>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string/trim_all.hpp>
 
 #include "TcpConnection.hpp"
 #include "RequestMessage.hpp"
@@ -45,6 +46,10 @@ void TcpConnection::read_complete(boost::system::error_code const &error, size_t
   try
   {
     RequestMessage message{packet_string};
+		message.perform_action([&](auto const& type, auto const& values){
+			(void)type;
+			std::cout << "Values received: " << values.size() << '\n';
+		});
   }
   catch(std::exception& err)
   {

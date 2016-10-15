@@ -3,7 +3,7 @@ const net = require('net');
 const client = net.createConnection({port: 1025}, () => {
   //'connect' listener
   console.log('connected to server!');
-  client.write("LOGA \"jsmith\" \"password1\" \"John\" \"Smith\"");
+  client.write("LOGU \"jsmith\" \"password1\"");
 });
 
 client.on('data', data => {

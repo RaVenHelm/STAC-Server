@@ -4,10 +4,10 @@
 
 std::tuple<bool, RequestType, std::smatch> match_string(std::string const& request)
 {
-  static const std::regex login_admin{ "^(LOGA)\\s+\"([A-z]+)\"\\s+\"(.+)\"$" };
-  static const std::regex login_user{ "^(LOGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"$" };
-  static const std::regex register_admin{ "^(REGA)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"$" };
-  static const std::regex register_user{ "^(REGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"$" };
+  static const std::regex login_admin{ "^(LOGA)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+$" };
+  static const std::regex login_user{ "^(LOGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+$" };
+  static const std::regex register_admin{ "^(REGA)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"\\s+$" };
+  static const std::regex register_user{ "^(REGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"\\s+$" };
   static const std::regex logout{"^(LOGO)$"};
 
   auto matches = std::smatch{};
@@ -49,9 +49,12 @@ RequestMessage::RequestMessage(std::string message)
   {
     m_request = std::get<RequestType>(result);
     auto matches = std::get<std::smatch>(result);
+    auto values = std::vector<std::string>{};
     for(unsigned i = 1; i < matches.size(); ++i)
     {
       std::cout << "Submatch: " << matches[i].str() << '\n';
+      values.push_back(matches[i].str());
     }
+		m_values = values;
   }
 }
