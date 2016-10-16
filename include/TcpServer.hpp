@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <thread>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -46,7 +47,7 @@ public:
       m_signals(m_service),
       m_dbi(std::make_shared<DBI>(connection_string(conf), conf.username, conf.password, conf.schema))
   {
-	m_dbi->executeRaw("select 'Hola, Lola!' as _message;", "_message");
+    std::cout << "DB connection made, starting server...\n";
     this->m_signals.add(SIGINT);
     this->m_signals.add(SIGTERM);
 #if defined(SIGQUIT)
@@ -57,7 +58,7 @@ public:
 
   void run(unsigned port)
   {
-    auto handler = boost::make_shared<ConnectionHandler>(m_service);
+    auto handler = boost::make_shared<ConnectionHandler>(m_service, m_dbi);
 
     boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
     m_acceptor.open(endpoint.protocol());
@@ -65,6 +66,7 @@ public:
     m_acceptor.bind(endpoint);
     m_acceptor.listen();
 
+    std::cout << "Server is now listening on port " << port << '\n';
     m_acceptor.async_accept(handler->socket(),
         [=](boost::system::error_code ec)
         {
@@ -87,13 +89,15 @@ private:
         m_acceptor.close();
       });
   }
+
   void handle_accept(shared_handler_t handler, boost::system::error_code const& error_code)
   {
     if(error_code) return;
 
+    std::cout << "Handling new connection...\n";
     handler->start();
 
-    auto new_handler = boost::make_shared<ConnectionHandler>(m_service);
+    auto new_handler = boost::make_shared<ConnectionHandler>(m_service, m_dbi);
 
     m_acceptor.async_accept(new_handler->socket(),
         [=](boost::system::error_code ec)

@@ -20,8 +20,6 @@ DBConfig stac::config::load_db_config_from_file(std::string const& filename)
   {
     lines.push_back(line);
   }
-
-  std::cout << lines.size() << '\n';
   if(lines.size() != 5)
     throw std::runtime_error("File must contain 5 lines");
 

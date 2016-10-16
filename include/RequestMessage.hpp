@@ -9,15 +9,13 @@
 
 enum class RequestType
 {
-  login_user,
-  login_admin,
-  register_user,
-  register_admin,
+  login_req,
+  register_req,
   logout,
   invalid
 };
 
-std::tuple<bool, RequestType, std::smatch> match_string(std::string const& request);
+auto match_string(std::string const& request);
 
 class RequestMessage
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdio>
 #include <iostream>
 #include <memory>
 
@@ -36,6 +35,7 @@ public:
       std::string const schema)
     : driver(get_driver_instance())
   {
+    std::cout << "Connecting to MySQL database on " << conStr << '\n';
     con = std::shared_ptr<sql::Connection>(driver->connect(conStr, username, password));
     con->setSchema(schema);
   }

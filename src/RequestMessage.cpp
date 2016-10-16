@@ -2,40 +2,30 @@
 
 #include <iostream>
 
-std::tuple<bool, RequestType, std::smatch> match_string(std::string const& request)
+auto match_string(std::string const& request)
 {
-  static const std::regex login_admin{ "^(LOGA)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+$" };
-  static const std::regex login_user{ "^(LOGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+$" };
-  static const std::regex register_admin{ "^(REGA)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"\\s+$" };
-  static const std::regex register_user{ "^(REGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"\\s+$" };
-  static const std::regex logout{"^(LOGO)$"};
+  static const std::regex login_regex{ "^(LOGA|LOGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s*$" };
+  static const std::regex register_regex{ "^(REGA|REGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"\\s*$" };
+  static const std::regex logout_regex{"^(LOGO)$"};
 
   auto matches = std::smatch{};
 
-  if(std::regex_match(request, matches, login_admin))
+  if(std::regex_match(request, matches, login_regex))
   {
-    return std::make_tuple(true, RequestType::login_admin, matches);
+    return std::make_tuple(true, RequestType::login_req, matches);
   }
-  else if(std::regex_match(request, matches, login_user))
+  
+  if(std::regex_match(request, matches, register_regex))
   {
-  return std::make_tuple(true, RequestType::login_user, matches);
+    return std::make_tuple(true, RequestType::register_req, matches);
   }
-  else if(std::regex_match(request, matches, register_admin))
-  {
-    return std::make_tuple(true, RequestType::register_admin, matches);
-  }
-  else if(std::regex_match(request, matches, register_user))
-  {
-    return std::make_tuple(true, RequestType::register_user, matches);
-  }
-  else if(std::regex_match(request, matches, logout))
+  
+  if(std::regex_match(request, matches, logout_regex))
   {
     return std::make_tuple(true, RequestType::logout, matches);
   }
-  else
-  {
-    return std::make_tuple(false, RequestType::invalid, matches);
-  }
+  
+  return std::make_tuple(false, RequestType::invalid, matches);
 }
 
 RequestMessage::RequestMessage(std::string message)
