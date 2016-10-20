@@ -47,7 +47,7 @@ public:
 			std::string statement
         = "INSERT INTO STACDB.Users (`FName`, `LName`, `UName`, `Password`) VALUES('"
           + fname + "', '" + lname + "', '" + uname + "', '" + password + "');";
-  			con->createStatement()->executeQuery(statement);
+  			con->createStatement()->execute(statement);
 		}
 		catch (sql::SQLException &e) {
 			r = 1;
@@ -88,7 +88,7 @@ public:
     {
 			std::string statement =
         "INSERT INTO STACDB.Admins (`FName`, `LName`, `UName`, `Password`) VALUES('" + fname + "', '" + lname + "', '" + uname + "', '" + password + "');";
-			con->createStatement()->executeQuery(statement);
+			con->createStatement()->execute(statement);
 		}
 		catch (sql::SQLException &e)
     {
@@ -122,15 +122,6 @@ public:
 
     return r;
 	}
-
-  void executeRaw(std::string const& query, std::string const& field)
-  {
-    auto res = std::unique_ptr<sql::ResultSet>(con->createStatement()->executeQuery(query));
-    while(res->next())
-    {
-      std::cout << "Result from raw query: " << res->getString(field) << '\n';
-    }
-  }
 }; // DBI
 } // db
 } // stac

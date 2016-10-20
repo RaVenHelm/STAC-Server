@@ -11,7 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "DBI.h"
+#include "DBI.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -29,7 +29,8 @@ class TcpConnection
   std::shared_ptr<stac::db::DBI> m_dbi;
   std::array<char, 4096> m_in_packet;
   std::vector<char> m_out_packet;
-  bool m_is_primed_for_shutdown;
+  bool m_is_primed_for_shutdown = false;
+  bool m_is_admin_session = false;
 public:
   TcpConnection(boost::asio::io_service& service, std::shared_ptr<stac::db::DBI> dbi)
     : m_service(service),

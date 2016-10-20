@@ -62,8 +62,15 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
   try
   {
     RequestMessage message{packet_string};
-    message.perform_action([&](auto const& type, auto const& values){
+    auto type = message.type();
+    auto values = message.values();
     std::cout << "Values received: " << values.size() << '\n';
+    
+    if(type == RequestType::heartbeat)
+    {
+      return;
+    }
+
     if(type == RequestType::invalid)
     {
       m_is_primed_for_shutdown = true;
@@ -75,6 +82,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       m_is_primed_for_shutdown = true;
       out_response = builder.logout_reponse(true);
     }
+
     if(type == RequestType::login_req)
     {
       auto command = values[0];
@@ -88,16 +96,15 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         auto res = m_dbi->LoginAdmin(uname, password);
         is_success = res == 0;
         // also set if the connection is for a admin
+        m_is_admin_session = true;
       }
 
       if(command == "LOGU")
       {
         auto res = m_dbi->LoginUser(uname, password);
         is_success = res == 0;
-        // also set if the connection is for a admin
       }
 
-      // uname password
       out_response = builder.login_response(is_success);
     }
 
@@ -110,20 +117,24 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       auto fname       = values[3];
       auto lname       = values[4];
 
+      auto is_success = false;
+
       if(command == "REGA")
       {
-        m_dbi->RegisterAdmin(fname, lname, uname, password);  
+        auto res = m_dbi->RegisterAdmin(fname, lname, uname, password);
         // set is admin
+        m_is_admin_session = true;
+        is_success = res == 0;
       }
 
       if(command == "REGU")
       {
-        m_dbi->RegisterUser(fname, lname, uname, password);
-        // set is user
+        auto res = m_dbi->RegisterUser(fname, lname, uname, password);
+        is_success = res == 0;
       }
-    }
 
-    });
+      out_response = builder.register_response(is_success);
+    }
   }
   catch(std::exception& err)
   {
@@ -134,7 +145,6 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
     return;
   }
 
-  out_response = packet_string;
   send(out_response);
 }
 

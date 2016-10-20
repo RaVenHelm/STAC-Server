@@ -1,14 +1,22 @@
 #include "RequestMessage.hpp"
 
 #include <iostream>
+#include <sstream>
+#include <exception>
 
 auto match_string(std::string const& request)
 {
   static const std::regex login_regex{ "^(LOGA|LOGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s*$" };
   static const std::regex register_regex{ "^(REGA|REGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"\\s*$" };
-  static const std::regex logout_regex{"^(LOGO)$"};
+  static const std::regex heartbeat_regex{ "^(HBRT)$" };
+  static const std::regex logout_regex{ "^(LOGO)$" };
 
   auto matches = std::smatch{};
+
+  if(std::regex_match(request, matches, heartbeat_regex))
+  {
+    return std::make_tuple(true, RequestType::heartbeat, matches);
+  }
 
   if(std::regex_match(request, matches, login_regex))
   {
@@ -31,13 +39,16 @@ auto match_string(std::string const& request)
 RequestMessage::RequestMessage(std::string message)
 {
   auto result = match_string(message);
-  if(!std::get<bool>(result))
+  auto success = std::get<bool>(result);
+  auto type   = std::get<RequestType>(result);
+  m_request = type;
+  if(!success)
   {
     std::cerr << "Cannot parse message: " << message << '\n';
+    m_values = {};
   }
   else
   {
-    m_request = std::get<RequestType>(result);
     auto matches = std::get<std::smatch>(result);
     auto values = std::vector<std::string>{};
     for(unsigned i = 1; i < matches.size(); ++i)

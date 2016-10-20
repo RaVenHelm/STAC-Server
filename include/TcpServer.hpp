@@ -10,7 +10,7 @@
 
 #include "TcpConnection.hpp"
 #include "DBConfig.hpp"
-#include "DBI.h"
+#include "DBI.hpp"
 
 using boost::asio::ip::tcp;
 using stac::config::DBConfig;

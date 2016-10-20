@@ -38,3 +38,12 @@ std::string ResponseBuilder::error_response(std::string err_message)
   ss << "ERR: \"" << err_message << "\"";
   return ss.str();
 }
+
+// Example:
+// REGR S 
+std::string ResponseBuilder::register_response(bool is_success)
+{
+	std::stringstream ss{};
+	ss << "REGR " << (is_success ? "S" : "F");
+	return ss.str();
+}

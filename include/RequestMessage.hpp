@@ -12,6 +12,7 @@ enum class RequestType
   login_req,
   register_req,
   logout,
+  heartbeat,
   invalid
 };
 
@@ -27,9 +28,6 @@ public:
   RequestMessage(RequestMessage const&) = delete;
   RequestMessage& operator=(RequestMessage const&) = delete;
 
-  template <typename Action>
-  void perform_action(Action action)
-  {
-    action(m_request, m_values);
-  }
+  auto type() const { return m_request; }
+  auto values() const { return m_values; }
 };
