@@ -16,7 +16,7 @@ int main() {
     boost::filesystem::path path{ "stac.conf" };
     auto abs_path = boost::filesystem::absolute(path);
     auto conf = stac::config::load_db_config_from_file(abs_path.generic_string());
-    
+
     // listens on localhost
     TcpServer<TcpConnection> server{ conf };
     server.run(1025);

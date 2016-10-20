@@ -56,7 +56,7 @@ public:
     handle_await_stop();
   }
 
-  void run(unsigned port)
+  void run(unsigned short port)
   {
     auto handler = boost::make_shared<ConnectionHandler>(m_service, m_dbi);
 

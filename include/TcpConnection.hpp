@@ -29,7 +29,7 @@ class TcpConnection
   std::shared_ptr<stac::db::DBI> m_dbi;
   std::array<char, 4096> m_in_packet;
   std::vector<char> m_out_packet;
-  bool m_is_primed_for_logout;
+  bool m_is_primed_for_shutdown;
 public:
   TcpConnection(boost::asio::io_service& service, std::shared_ptr<stac::db::DBI> dbi)
     : m_service(service),
@@ -38,7 +38,7 @@ public:
       m_dbi(dbi),
       m_in_packet(),
       m_out_packet(),
-      m_is_primed_for_logout(false)
+      m_is_primed_for_shutdown(false)
   {
   }
 

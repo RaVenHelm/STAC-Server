@@ -40,29 +40,88 @@ public:
     con->setSchema(schema);
   }
 
-  //Inserts users into the database after given info from the user
-  void insertUser(std::string username, std::string ip, std::string statement)
-  {
-    con->createStatement()->executeQuery(statement);
-  }
+  int RegisterUser(std::string fname, std::string lname, std::string uname, std::string password)
+	{
+		int r = 0;
+		try {
+			std::string statement
+        = "INSERT INTO STACDB.Users (`FName`, `LName`, `UName`, `Password`) VALUES('"
+          + fname + "', '" + lname + "', '" + uname + "', '" + password + "');";
+  			con->createStatement()->executeQuery(statement);
+		}
+		catch (sql::SQLException &e) {
+			r = 1;
+      print_sql_error(std::cout, e);
+		}
+		return r;
+	}
 
-  void deleteUser(std::string userId, std::string statement)
-  {
-    con->createStatement()->executeQuery(statement);
-  }
+  int LoginUser(std::string uname, std::string password)
+	{
+		int r = 0;
+		try
+    {
+      std::string resultP;
+			std::string statement
+        = "SELECT `UName`,`Password` FROM STACDB.Users WHERE `UName`='" + uname + "';";
+			auto res = std::unique_ptr<sql::ResultSet>(con->createStatement()->executeQuery(statement));
+			while (res->next()) {
+				resultP = res->getString("Password");
+			}
+			if (resultP != password) {
+				r = 1;
+			}
+		}
+		catch (sql::SQLException &e)
+    {
+			r = 2;
+			print_sql_error(std::cout, e);
+		}
 
-  std::string selectUser(std::string user, std::string statement)
-  {
-    std::string resultU, resultI, result, finalResults;
-    auto res = std::unique_ptr<sql::ResultSet>(con->createStatement()->executeQuery(statement));
-    while (res->next()) {
-      resultU = res->getString("FName");
-      resultI = res->getString("UName");
-      result = resultU + " " + resultI + "\n";
-      finalResults += result;
-    }
-    return finalResults;
-  }
+    return r;
+	}
+
+	int RegisterAdmin(std::string fname, std::string lname, std::string uname, std::string password)
+	{
+		int r = 0;
+		try
+    {
+			std::string statement =
+        "INSERT INTO STACDB.Admins (`FName`, `LName`, `UName`, `Password`) VALUES('" + fname + "', '" + lname + "', '" + uname + "', '" + password + "');";
+			con->createStatement()->executeQuery(statement);
+		}
+		catch (sql::SQLException &e)
+    {
+			r = 1;
+			print_sql_error(std::cout, e);
+		}
+		return r;
+	}
+
+  int LoginAdmin(std::string uname, std::string password)
+	{
+		std::string resultP{};
+		int r = 0;
+		try
+    {
+			std::string statement =
+        "SELECT `UName`,`Password` FROM STACDB.Admins WHERE `UName`='" + uname + "';";
+      auto res = std::unique_ptr<sql::ResultSet>(con->createStatement()->executeQuery(statement));
+			while (res->next()) {
+				resultP = res->getString("Password");
+			}
+			if (resultP != password) {
+				r = 1;
+			}
+		}
+		catch (sql::SQLException &e)
+    {
+			r = 2;
+			print_sql_error(std::cout, e);
+		}
+
+    return r;
+	}
 
   void executeRaw(std::string const& query, std::string const& field)
   {

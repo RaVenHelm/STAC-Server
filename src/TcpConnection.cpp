@@ -4,8 +4,10 @@
 
 #include "TcpConnection.hpp"
 #include "RequestMessage.hpp"
+#include "ResponseBuilder.hpp"
 
 using stac::tcpip::TcpConnection;
+using stac::core::ResponseBuilder;
 
 void TcpConnection::start() {
   read_from_socket();
@@ -55,30 +57,85 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
   std::cout << "Message size: " << bytes_transferred << '\n';
   std::cout << packet_string << '\n';
   boost::trim_all(packet_string);
+  ResponseBuilder builder{};
+  std::string out_response{};
   try
   {
     RequestMessage message{packet_string};
     message.perform_action([&](auto const& type, auto const& values){
-    (void)type;
     std::cout << "Values received: " << values.size() << '\n';
+    if(type == RequestType::invalid)
+    {
+      m_is_primed_for_shutdown = true;
+      out_response = builder.invalid_request(packet_string);
+    }
+
     if(type == RequestType::logout)
     {
-      m_is_primed_for_logout = true;
+      m_is_primed_for_shutdown = true;
+      out_response = builder.logout_reponse(true);
     }
+    if(type == RequestType::login_req)
+    {
+      auto command = values[0];
+      auto uname = values[1];
+      auto password = values[2];
+      auto is_success = false;
+
+      // Check for LOGA or LOGU
+      if(command == "LOGA")
+      {
+        auto res = m_dbi->LoginAdmin(uname, password);
+        is_success = res == 0;
+        // also set if the connection is for a admin
+      }
+
+      if(command == "LOGU")
+      {
+        auto res = m_dbi->LoginUser(uname, password);
+        is_success = res == 0;
+        // also set if the connection is for a admin
+      }
+
+      // uname password
+      out_response = builder.login_response(is_success);
+    }
+
+    if(type == RequestType::register_req)
+    {
+      // fname lname uname password
+      auto command     = values[0];
+      auto uname       = values[1];
+      auto password    = values[2];
+      auto fname       = values[3];
+      auto lname       = values[4];
+
+      if(command == "REGA")
+      {
+        m_dbi->RegisterAdmin(fname, lname, uname, password);  
+        // set is admin
+      }
+
+      if(command == "REGU")
+      {
+        m_dbi->RegisterUser(fname, lname, uname, password);
+        // set is user
+      }
+    }
+
     });
   }
   catch(std::exception& err)
   {
-    std::cerr << err.what() << '\n';
+    auto err_message = err.what();
+    std::cerr << "Error occurred during processing request: " << err_message << '\n';
+    m_is_primed_for_shutdown = true;
+    out_response = builder.error_response(err_message);
     return;
   }
 
-  if(m_is_primed_for_logout)
-  {
-    send("LOGO");
-    return;
-  }
-  send(packet_string);
+  out_response = packet_string;
+  send(out_response);
 }
 
 void TcpConnection::write_to_socket() {
@@ -93,16 +150,15 @@ void TcpConnection::write_to_socket() {
 
 void TcpConnection::write_complete(boost::system::error_code& error, size_t /*bytes_transferred*/)
 {
-  if(error)
+  if(error.value() != 0)
   {
     std::cerr << "Error during write: " << error.message() << '\n';
     stop(error);
     return;
   }
 
-  if(m_is_primed_for_logout)
+  if(m_is_primed_for_shutdown)
   {
-    std::cout << "Logging out user: [FILL IN LATER]\n";
     stop();
     return;
   }
