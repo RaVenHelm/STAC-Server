@@ -68,7 +68,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
     
     if(type == RequestType::heartbeat)
     {
-      return;
+      out_response = builder.heartbeat_response();
     }
 
     if(type == RequestType::invalid)

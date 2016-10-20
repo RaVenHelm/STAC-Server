@@ -47,3 +47,12 @@ std::string ResponseBuilder::register_response(bool is_success)
 	ss << "REGR " << (is_success ? "S" : "F");
 	return ss.str();
 }
+
+// Example
+// HRBT => OK
+std::string ResponseBuilder::heartbeat_response()
+{
+  std::stringstream ss{};
+  ss << "OK";
+  return ss.str();
+}

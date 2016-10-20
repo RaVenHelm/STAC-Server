@@ -16,6 +16,7 @@ struct ResponseBuilder
   std::string logout_reponse(bool is_success);
   std::string error_response(std::string err_message);
   std::string register_response(bool is_success);
+  std::string heartbeat_response();
 };
 }
 }

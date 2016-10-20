@@ -8,7 +8,7 @@ auto match_string(std::string const& request)
 {
   static const std::regex login_regex{ "^(LOGA|LOGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s*$" };
   static const std::regex register_regex{ "^(REGA|REGU)\\s+\"([A-z]+)\"\\s+\"(.+)\"\\s+\"([A-z]+)\"\\s+\"([A-z]+)\"\\s*$" };
-  static const std::regex heartbeat_regex{ "^(HBRT)$" };
+  static const std::regex heartbeat_regex{ "^(HRBT)$" };
   static const std::regex logout_regex{ "^(LOGO)$" };
 
   auto matches = std::smatch{};
