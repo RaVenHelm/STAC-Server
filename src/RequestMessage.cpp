@@ -1,8 +1,16 @@
 #include "RequestMessage.hpp"
 
+#include <map>
 #include <iostream>
 #include <sstream>
 #include <exception>
+
+static const std::map<RequestType, std::regex> regex_map = {
+  {RequestType::login, std::regex{ "^(LOGA|LOGU)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s*$" }},
+  {RequestType::logout, std::regex{ "^(LOGA|LOGU)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s*$" }},
+  {RequestType::register_req, std::regex{ "^(LOGA|LOGU)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s*$" }},
+  {RequestType::heartbeat, std::regex{ "^(LOGA|LOGU)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s*$" }}
+};
 
 // TODO: Maybe make this a private static member function (?)
 // See standards/requirements document for message specification
@@ -11,8 +19,8 @@ auto match_string(std::string const& request)
   // The "\s*"'s' at the end for random whitespace characters that may come from
   // Programs like netcat or Java
   // TODO: Refactor into a std::map<RequestType, std::regex> ?
-  // Probably would also 
-  static const std::regex login_regex{ "^(LOGA|LOGU)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s*$" };
+  // Probably would also
+  /* static const std::regex login_regex{ "" }; */
   static const std::regex register_regex{ "^(REGA|REGU)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s\"([^0-9\"]+)\"\\s\"([^0-9\"]+)\"\\s*$" };
   static const std::regex heartbeat_regex{ "^(HRBT)\\s*$" };
   static const std::regex logout_regex{ "^(LOGO)$\\s*" };
@@ -26,19 +34,19 @@ auto match_string(std::string const& request)
 
   if(std::regex_match(request, matches, login_regex))
   {
-    return std::make_tuple(true, RequestType::login_req, matches);
+    return std::make_tuple(true, RequestType::login, matches);
   }
-  
+
   if(std::regex_match(request, matches, register_regex))
   {
     return std::make_tuple(true, RequestType::register_req, matches);
   }
-  
+
   if(std::regex_match(request, matches, logout_regex))
   {
     return std::make_tuple(true, RequestType::logout, matches);
   }
-  
+
   return std::make_tuple(false, RequestType::invalid, matches);
 }
 

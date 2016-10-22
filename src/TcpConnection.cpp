@@ -66,7 +66,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
     auto type = message.type();
     auto values = message.values();
     std::cout << "Values received: " << values.size() << '\n';
-    
+
     if(type == RequestType::heartbeat)
     {
       out_response = builder.heartbeat_response();
@@ -127,7 +127,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
           std::cout << "Login status: " << is_success << '\n';
           m_is_logged_in = true;
           out_response = builder.login_response(is_success);
-        } 
+        }
       }
     }
 

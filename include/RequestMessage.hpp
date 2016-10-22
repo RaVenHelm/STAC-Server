@@ -9,8 +9,8 @@
 
 enum class RequestType
 {
-  login_req,
-  register_req,
+  login,
+  register_req, // register is a reserved keyword
   logout,
   heartbeat,
   invalid
