@@ -31,6 +31,7 @@ class TcpConnection
   std::vector<char> m_out_packet;
   bool m_is_primed_for_shutdown = false;
   bool m_is_admin_session = false;
+  bool m_is_logged_in = false;
 public:
   TcpConnection(boost::asio::io_service& service, std::shared_ptr<stac::db::DBI> dbi)
     : m_service(service),

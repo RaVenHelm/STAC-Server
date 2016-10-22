@@ -50,6 +50,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
   auto&& iter = m_in_packet.begin();
   std::string packet_string { iter, iter + bytes_transferred };
 
+  std::cout << std::boolalpha;
   // Work to do after reading
   auto now = boost::posix_time::microsec_clock::local_time();
   std::cout << '[' << now << "]\n";
@@ -93,19 +94,41 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       // Check for LOGA or LOGU
       if(command == "LOGA")
       {
-        auto res = m_dbi->LoginAdmin(uname, password);
-        is_success = res == 0;
-        // also set if the connection is for a admin
-        m_is_admin_session = true;
+        if (m_is_logged_in)
+        {
+          out_response = builder.error_response("Already logged in, killing connection");
+          m_is_primed_for_shutdown = true;
+        }
+        else
+        {
+          std::cout << "Logging in Admin..." << uname << '\n';
+          auto res = m_dbi->LoginAdmin(uname, password);
+          is_success = res == 0;
+          // also set if the connection is for a admin
+          m_is_admin_session = true;
+          m_is_logged_in = true;
+          std::cout << "Login status: " << is_success << '\n';
+          out_response = builder.login_response(is_success);
+        }
       }
 
       if(command == "LOGU")
       {
-        auto res = m_dbi->LoginUser(uname, password);
-        is_success = res == 0;
+        if (m_is_logged_in)
+        {
+          out_response = builder.error_response("Already logged in, killing connection");
+          m_is_primed_for_shutdown = true;
+        }
+        else
+        {
+          std::cout << "Logging in user... " << uname << '\n';
+          auto res = m_dbi->LoginUser(uname, password);
+          is_success = res == 0;
+          std::cout << "Login status: " << is_success << '\n';
+          m_is_logged_in = true;
+          out_response = builder.login_response(is_success);
+        } 
       }
-
-      out_response = builder.login_response(is_success);
     }
 
     if(type == RequestType::register_req)
@@ -121,19 +144,41 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
 
       if(command == "REGA")
       {
-        auto res = m_dbi->RegisterAdmin(fname, lname, uname, password);
-        // set is admin
-        m_is_admin_session = true;
-        is_success = res == 0;
+        if(m_is_logged_in)
+        {
+          out_response = builder.error_response("Already logged in, killing connection");
+          m_is_primed_for_shutdown = true;
+        }
+        else
+        {
+          std::cout << "About to register admin...\n";
+          auto res = m_dbi->RegisterAdmin(fname, lname, uname, password);
+          // set is admin
+          m_is_admin_session = true;
+          is_success = res == 0;
+          m_is_logged_in = true;
+          std::cout << "Registration status: " << is_success << '\n';
+          out_response = builder.register_response(is_success);
+        }
       }
 
       if(command == "REGU")
       {
-        auto res = m_dbi->RegisterUser(fname, lname, uname, password);
-        is_success = res == 0;
+        if(m_is_logged_in)
+        {
+          out_response = builder.error_response("Already logged in, killing connection");
+          m_is_primed_for_shutdown = true;
+        }
+        else
+        {
+          std::cout << "About to register user...\n";
+          auto res = m_dbi->RegisterUser(fname, lname, uname, password);
+          is_success = res == 0;
+          m_is_logged_in = true;
+          std::cout << "Registration status: " << is_success << '\n';
+          out_response = builder.register_response(is_success);
+        }
       }
-
-      out_response = builder.register_response(is_success);
     }
   }
   catch(std::exception& err)
@@ -179,6 +224,7 @@ void TcpConnection::write_complete(boost::system::error_code& error, size_t /*by
 
 void TcpConnection::send(std::string msg)
 {
+  std::cout << "Sending message: " << msg << '\n';
   std::copy(std::begin(msg), std::end(msg), std::back_inserter(m_out_packet));
   write_to_socket();
 }
