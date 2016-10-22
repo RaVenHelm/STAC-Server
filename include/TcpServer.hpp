@@ -72,7 +72,7 @@ public:
         {
           handle_accept(handler, ec);
         });
-    for(unsigned int i = 0; i < m_thread_count; ++i)
+    for(unsigned i = 0; i < m_thread_count; ++i)
     {
       m_thread_pool.emplace_back( [=]{ m_service.run(); } );
     }

@@ -52,23 +52,23 @@ DBConfig stac::config::load_db_config_from_file(std::string const& filename)
     std::for_each(std::begin(kvp), std::end(kvp),
       [&](auto const& pair){
         auto k = pair.first;
-        if(k.compare("ip") == 0)
+        if(k == "ip")
         {
           config.ip = pair.second;
         }
-        else if(k.compare("port") == 0)
+        else if(k == "port")
         {
           config.port = pair.second;
         }
-        else if(k.compare("username") == 0)
+        else if(k == "username")
         {
           config.username = pair.second;
         }
-        else if(k.compare("password") == 0)
+        else if(k == "password")
         {
           config.password = pair.second;
         }
-        else if(k.compare("schema") == 0)
+        else if(k == "schema")
         {
           config.schema = pair.second;
         }
