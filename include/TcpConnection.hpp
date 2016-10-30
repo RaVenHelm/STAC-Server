@@ -27,7 +27,7 @@ class TcpConnection
   tcp::socket m_socket; // TCP/IP Socket abstraction
   boost::asio::strand m_write_strand; // used for protecting two threads writing to the socket at the same time
   std::shared_ptr<stac::db::DBI> m_dbi; // essentially a handle to the DB interface
-                                        // doubt I'll need syncronization, but here is where that'd go
+                                        // doubt we'll need syncronization, but here is where that'd go
   std::array<char, 4096> m_in_packet; // input character buffer, could maybe change the size later
   std::vector<char> m_out_packet; // output character buffer
   
@@ -37,6 +37,11 @@ class TcpConnection
   bool m_is_primed_for_shutdown = false;
   bool m_is_admin_session = false;
   bool m_is_logged_in = false;
+
+  // Username and id for the session
+  std::string m_username{};
+  int m_id = -1;
+
 public:
   // Each connection will need a IO service and DB handle in order to function correctly
   TcpConnection(boost::asio::io_service& service, std::shared_ptr<stac::db::DBI> dbi)

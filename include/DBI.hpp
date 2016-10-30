@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include <vector>
 #include <memory>
 
 #include "mysql_connection.h"
@@ -8,6 +10,9 @@
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
+
+#include "Class.hpp"
 
 namespace stac
 {
@@ -121,6 +126,117 @@ public:
 		}
 
     return r;
+	}
+
+	int GetAdminIdFromName(std::string name)
+	{
+		int result = 0;
+		try
+		{
+			std::string statement = "SELCT ID from Admins WHERE UName='?';";
+			auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
+			p_stmt->setString(1, name);
+
+			auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
+			if(res->next()) {
+				result = res->getInt("ID");
+			}
+		}
+		catch(sql::SQLException &e)
+		{
+			result = -e.getErrorCode();
+			print_sql_error(std::cout, e);
+		}
+
+		return result;
+	}
+
+	int GetUserIdFromName(std::string name)
+	{
+		int result = 0;
+		try
+		{
+			std::string statement = "SELCT ID from Users WHERE UName='?';";
+			auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
+			p_stmt->setString(1, name);
+			
+			auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
+			if(res->next()) {
+				result = res->getInt("ID");
+			}
+		}
+		catch(sql::SQLException &e)
+		{
+			result = -e.getErrorCode();
+			print_sql_error(std::cout, e);
+		}
+
+		return result;
+	}
+
+	std::vector<int> SelectClassID(std::string class_name, std::string institution)
+	{
+		std::vector<int> result{};
+		std::string statement = "SELECT ClassID FROM STACDB.Classes WHERE ClassName LIKE '?%' AND Institution LIKE '?%';";
+
+		auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
+		p_stmt->setString(1, class_name);
+		p_stmt->setString(2, institution);
+
+		auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
+		while(res->next())
+		{
+			result.push_back(res->getInt("ClassID"));
+		}
+
+		return result;
+	}
+
+	std::vector<stac::core::Class> SelectClassDetails(int class_id)
+	{
+		std::vector<stac::core::Class> result{};
+		std::string statement = "SELECT * FROM STACDB.Classes WHERE ClassID=?;";
+		auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
+		p_stmt->setInt(1, class_id);
+
+		auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
+		while(res->next())
+		{
+			auto id = res->getInt("ClassID");
+			auto name = res->getString("ClassName");
+			auto admin_id = res->getInt("AdminID");
+			auto institution = res->getString("Institution");
+			auto meet_time = res->getString("MeetTimes");
+			auto start_date = res->getString("StartDate");
+			auto end_date = res->getString("EndDate");
+			auto ip = res->getString("PublicIPAddress");
+			stac::core::Class cls{id, name, institution, admin_id, meet_time, start_date, end_date, ip};
+			result.push_back(cls);
+		}
+		return result;
+	}
+
+	int CreateClass(std::string class_name,
+									int admin_id,
+							    std::string institution,
+									std::string start_date,
+									std::string end_date,
+									std::string ip_address,
+									std::string meetings)
+	{
+		std::string statement = "INSERT INTO stacdb.Classes (ClassName, AdminID, Institution, MeetTimes, StartDate, EndDate, PublicIPAdress) VALUES (?,?,?,?,?,?,?);";
+		auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
+		p_stmt->setString(1, class_name);
+		p_stmt->setInt(2, admin_id);
+		p_stmt->setString(3, institution);
+		p_stmt->setString(4, meetings);
+		p_stmt->setString(5, start_date);
+		p_stmt->setString(6, end_date);
+		p_stmt->setString(7, ip_address);
+
+		auto record_code = p_stmt->executeUpdate();
+
+		return record_code;
 	}
 }; // DBI
 } // db

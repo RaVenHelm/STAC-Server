@@ -121,7 +121,12 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
           // also set if the connection is for a admin
           m_is_admin_session = true;
 
-          if(is_success) m_is_logged_in = true;
+          if(is_success)
+          {
+            m_is_logged_in = true;
+            m_username = uname;
+            m_id = m_dbi->GetAdminIdFromName(uname);
+          }
           std::cout << "Login status: " << is_success << '\n';
           out_response = builder.login_response(is_success);
         }
@@ -132,7 +137,12 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
           auto res = m_dbi->LoginUser(uname, password);
           is_success = res == 0;
 
-          if(is_success) m_is_logged_in = true;
+          if(is_success)
+          {
+            m_is_logged_in = true;
+            m_username = uname;
+            m_id = m_dbi->GetUserIdFromName(uname);
+          }
           std::cout << "Login status: " << is_success << '\n';
           out_response = builder.login_response(is_success);
         }
@@ -165,7 +175,12 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
           m_is_admin_session = true;
           is_success = res == 0;
 
-          if(is_success) m_is_logged_in = true;
+          if(is_success)
+          {
+            m_is_logged_in = true;
+            m_username = uname;
+            m_id = m_dbi->GetAdminIdFromName(uname);
+          }
           std::cout << "Registration status: " << is_success << '\n';
           out_response = builder.register_response(is_success);
         }
@@ -176,7 +191,12 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
           auto res = m_dbi->RegisterUser(fname, lname, uname, password);
           is_success = res == 0;
 
-          if(is_success) m_is_logged_in = true;
+          if(is_success)
+          {
+            m_is_logged_in = true;
+            m_username = uname;
+            m_id = m_dbi->GetUserIdFromName(uname);
+          }
           std::cout << "Registration status: " << is_success << '\n';
           out_response = builder.register_response(is_success);
         }
