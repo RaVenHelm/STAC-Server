@@ -38,6 +38,8 @@ class TcpConnection
   bool m_is_admin_session = false;
   bool m_is_logged_in = false;
 
+  std::string m_remote_ip{};
+
   // Username and id for the session
   std::string m_username{};
   int m_id = -1;

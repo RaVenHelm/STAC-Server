@@ -7,7 +7,7 @@ set(Boost_USE_STATIC_RUNTIME     OFF)
 if(NOT BOOST_ROOT)
   set(BOOST_ROOT "${CMAKE_SOURCE_DIR}")
 endif()
-find_package(Boost 1.61.0 REQUIRED chrono date_time filesystem system)
+find_package(Boost 1.61.0 REQUIRED chrono date_time filesystem system regex)
 
 if (Boost_FOUND)
   include_directories(SYSTEM ${Boost_INCLUDE_DIRS})

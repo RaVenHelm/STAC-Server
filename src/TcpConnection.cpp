@@ -15,7 +15,7 @@ void TcpConnection::start() {
 
 void TcpConnection::stop() {
   std::cout << "Clean shutting down of connection\n";
-  auto ignored_code = boost::system::error_code();
+  auto ignored_code = boost::system::error_code{};
   m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_code);
 }
 
@@ -25,7 +25,7 @@ void TcpConnection::stop(boost::system::error_code& error_code) {
 }
 
 void TcpConnection::read_from_socket() {
-  // Blocking call(?) that registers a callback to boost::asio when a read happens
+  // Blocking call that registers a callback to boost::asio when a read happens
   m_socket.async_receive(boost::asio::buffer(m_in_packet, 4096),
   [self = shared_from_this()](boost::system::error_code ec, size_t sz)
   {
@@ -64,7 +64,8 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
   std::cout << '[' << now << "]\n";
 
   // Get size and remote IP of socket
-  std::cout << "Message recieved from: " << m_socket.remote_endpoint().address().to_string() << '\n';
+  m_remote_ip = m_socket.remote_endpoint().address().to_string();
+  std::cout << "Message recieved from: " << m_remote_ip << '\n';
   std::cout << "Message size: " << bytes_transferred << '\n';
   std::cout << packet_string << '\n';
 
