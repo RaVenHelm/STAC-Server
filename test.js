@@ -4,7 +4,7 @@ const client = net.createConnection({port: 1025}, () => {
   //'connect' listener
   console.log('connected to server!');
   client.write("LOGU \"ejohn\" \"rocketman\"");
-  setTimeout(() => client.write("LOGU \"ejohn\" \"rocketman\""), 3000);
+  setTimeout(() => client.write("LOGO"), 3000);
 });
 
 client.on('data', data => {

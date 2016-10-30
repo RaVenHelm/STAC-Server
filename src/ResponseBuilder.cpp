@@ -7,8 +7,7 @@ using stac::core::ResponseBuilder;
 std::string ResponseBuilder::invalid_request(std::string message)
 {
   std::stringstream ss{};
-  ss << "ERR " << "\"Invalid response: " << message
-     << "\"";
+  ss << "ERR " << "\"Invalid response: " << message << "\"";
   return ss.str();
 }
 

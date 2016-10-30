@@ -14,16 +14,18 @@ if (Boost_FOUND)
 endif()
 
 # MySQL
-if(UNIX)
+if(UNIX AND NOT STAC_MYSQLCPP_ROOT)
   include_directories(/usr/local/include)
   link_directories(/usr/local/lib)
   set(STAC_MYSQL_LIBS libmysqlcppconn.so)
+elseif(STAC_MYSQLCPP_ROOT)
+  include_directories(SYSTEM "${STAC_MYSQLCPP_ROOT}/include")
+  link_directories("${STAC_MYSQLCPP_ROOT}/lib")
+  set(STAC_MYSQL_LIBS libmysqlcppconn.so)
 else()
-  include_directories("C:\\Program Files (x86)\\MySQL\\MySQL Connector C 6.1\\include")
   include_directories("C:\\Program Files (x86)\\MySQL\\MySQL Connector C++ 1.1.7\\include")
-  link_directories("C:\\Program Files (x86)\\MySQL\\MySQL Connector C 6.1\\lib")
   link_directories("C:\\Program Files (x86)\\MySQL\\MySQL Connector C++ 1.1.7\\lib\\opt")
-  set(STAC_MYSQL_LIBS libmysql.lib mysqlcppconn.lib)
+  set(STAC_MYSQL_LIBS mysqlcppconn.lib)
 endif()
 
 # libmysql.lib

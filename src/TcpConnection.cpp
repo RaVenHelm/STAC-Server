@@ -229,5 +229,6 @@ void TcpConnection::send(std::string msg)
 {
   std::cout << "Sending message: " << msg << '\n';
   std::copy(msg.begin(), msg.end(), std::back_inserter(m_out_packet));
+  m_out_packet.push_back('\n');
   write_to_socket();
 }
