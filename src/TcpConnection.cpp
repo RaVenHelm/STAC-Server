@@ -6,6 +6,8 @@
 #include "TcpConnection.hpp"
 #include "RequestMessage.hpp"
 #include "ResponseBuilder.hpp"
+#include "Utility.hpp"
+#include "Random.hpp"
 
 using stac::tcpip::TcpConnection;
 using stac::core::ResponseBuilder;
@@ -250,7 +252,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
 
     if (type == RequestType::class_create)
     {
-      if (m_is_admin_session = true && m_is_logged_in)
+      if (m_is_admin_session == true && m_is_logged_in)
       {
         auto command = values[0];
         auto clsname = values[1];
@@ -260,9 +262,17 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         auto ip_address = values[5];
         auto dow_time = values[6];
         auto is_success = false;
-        std::cout << clsname << " " << m_id << " " << instit << " " << start_date << " " << end_date << " " << ip_address << " " << dow_time << '\n';
-        // This result is the class ID inserted into the database
-        auto res = m_dbi->CreateClass(clsname, m_id, instit, start_date, end_date, ip_address, dow_time);
+
+        // If the user doens't supply us with one
+        if(ip_address.empty())
+        {
+          ip_address = m_remote_ip;
+        }
+
+        auto class_id = stac::utility::generate_random_id(2016, 10);
+        start_date = stac::utility::reorder_date_format(start_date);
+        end_date = stac::utility::reorder_date_format(end_date);
+        auto res = m_dbi->CreateClass(clsname, m_id, instit, start_date, end_date, ip_address, dow_time, class_id);
         is_success = res > 0;
 
         out_response = builder.create_class_response(is_success, res);

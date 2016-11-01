@@ -55,7 +55,8 @@ public:
                   std::string start_date,
                   std::string end_date,
                   std::string ip_address,
-                  std::string meetings);
+                  std::string meetings,
+                  int class_id);
 }; // DBI
 } // db
 } // stac

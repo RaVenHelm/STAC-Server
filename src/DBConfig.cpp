@@ -9,9 +9,7 @@
 #include <map>
 #include <iostream>
 
-using namespace stac::config;
-
-DBConfig stac::config::load_db_config_from_file(std::string const& filename)
+stac::config::DBConfig stac::config::load_db_config_from_file(std::string const& filename)
 {
   std::ifstream file{ filename };
   std::vector<std::string> lines;
@@ -20,8 +18,13 @@ DBConfig stac::config::load_db_config_from_file(std::string const& filename)
   {
     lines.push_back(line);
   }
-  if(lines.size() != 5)
+  if(lines.size() == 0) {
+    throw std::runtime_error("Config file is missing of is empty");
+  }
+
+  if(lines.size() != 5) {
     throw std::runtime_error("File must contain 5 lines");
+  }
 
   std::regex config_regex{ "^(ip|port|username|password|schema)=(.+)$" };
   std::smatch matches{};

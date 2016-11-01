@@ -75,6 +75,7 @@ std::string ResponseBuilder::class_view_response(bool is_success, boost::optiona
     ss << "CDTR " << "S" << ' '
      << "\"" << maybe_class->id << "\"" << ' '
      << "\"" << maybe_class->institution << "\"" << ' '
+     << "\"" << maybe_class->name << "\"" << ' '
      << "\"" << maybe_class->admin_id << "\"" << ' '
      << "\"" << maybe_class->meetings << "\"";
   }

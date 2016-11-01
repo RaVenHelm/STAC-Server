@@ -15,7 +15,7 @@ static const std::map<RequestType, std::regex> regex_map = {
   {RequestType::register_req, std::regex{"^(REGA|REGU)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s\"([^0-9\"]+)\"\\s\"([^0-9\"]+)\"\\s*$"}},
   {RequestType::class_search, std::regex{"^(CSRC)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s*$"}},
   {RequestType::class_view, std::regex{"^(CDTL)\\s\"([A-z0-9]+)\"\\s*$"}},
-  {RequestType::class_create, std::regex{ "^(CRCR)\\s\"([A-z0-9]+)\"\\s\"([^\"]+)\"\\s\"(\\d{2}-\\d{2}-\\d{4})\"\\s\"(\\d{2}-\\d{2}-\\d{4})\"\\s\"(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})?\"\\s\"([A-z]\\d{4}-\\d{4};?)+\"\\s*$"}}
+  {RequestType::class_create, std::regex{ "^(CRCR)\\s\"([A-z0-9 ]+)\"\\s\"([^\"]+)\"\\s\"(\\d{2}-\\d{2}-\\d{4})\"\\s\"(\\d{2}-\\d{2}-\\d{4})\"\\s\"(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})?\"\\s\"([A-z]\\d{4}-\\d{4};?)+\"\\s*$"}}
 };
 
 // TODO: Maybe make this a private static member function (?)

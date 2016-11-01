@@ -3,8 +3,8 @@ const net = require('net');
 const client = net.createConnection({port: 1025}, () => {
   //'connect' listener
   console.log('connected to server!');
-  client.write("LOGU \"ejohn\" \"rocketman\"");
-  setTimeout(() => client.write("LOGO"), 3000);
+  client.write("LOGA \"ejohn\" \"rocketman\"");
+  client.write("CRCR \"The White Album\" \"UNC-2\" \"11-09-2016\" \"03-14-2017\" \"\" \"M1030-1130;W1030-1130;F1030-1130\"");
 });
 
 client.on('data', data => {
