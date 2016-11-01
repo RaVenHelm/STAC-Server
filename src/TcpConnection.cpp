@@ -1,5 +1,4 @@
-#include <cstdlib>
-
+#include <string>
 #include <iterator>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string/trim_all.hpp>
@@ -214,7 +213,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       if (m_is_logged_in)
       {
         auto cid_str = values[1];
-        auto cid = static_cast<int>(std::strtol(cid_str.c_str(), nullptr, 10));
+        auto cid = std::stoi(cid_str.c_str(), nullptr, 10);
         auto is_success = false;
         std::cout << cid << '\n';
         auto res = m_dbi->SelectClassDetails(cid);
