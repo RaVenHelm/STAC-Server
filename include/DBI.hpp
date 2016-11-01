@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include "mysql_connection.h"
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
@@ -46,7 +48,7 @@ public:
   int GetAdminIdFromName(std::string name);
   int GetUserIdFromName(std::string name);
   std::vector<int> SelectClassID(std::string class_name, std::string institution);
-  std::vector<stac::core::Class> SelectClassDetails(int class_id);
+  boost::optional<stac::core::Class> SelectClassDetails(int class_id);
   int CreateClass(std::string class_name,
                   int admin_id,
                   std::string institution,

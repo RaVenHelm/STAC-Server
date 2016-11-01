@@ -164,15 +164,14 @@ std::vector<int> DBI::SelectClassID(std::string class_name, std::string institut
   return result;
 }
 
-std::vector<stac::core::Class> DBI::SelectClassDetails(int class_id)
+boost::optional<stac::core::Class> DBI::SelectClassDetails(int class_id)
 {
-  std::vector<stac::core::Class> result{};
   std::string statement = "SELECT * FROM STACDB.Classes WHERE ClassID=?;";
   auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
   p_stmt->setInt(1, class_id);
 
   auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
-  while (res->next())
+  if (res->next())
   {
     auto id = res->getInt("ClassID");
     auto name = res->getString("ClassName");
@@ -183,9 +182,12 @@ std::vector<stac::core::Class> DBI::SelectClassDetails(int class_id)
     auto end_date = res->getString("EndDate");
     auto ip = res->getString("PublicIPAddress");
     stac::core::Class cls{id, name, institution, admin_id, meet_time, start_date, end_date, ip};
-    result.push_back(cls);
+    return cls;
   }
-  return result;
+  else
+  {
+    return boost::none;
+  }
 }
 
 int DBI::CreateClass(std::string class_name,
@@ -196,7 +198,7 @@ int DBI::CreateClass(std::string class_name,
                      std::string ip_address,
                      std::string meetings)
 {
-  std::string statement = "INSERT INTO stacdb.Classes (ClassName, AdminID, Institution, MeetTimes, StartDate, EndDate, PublicIPAdress) VALUES (?,?,?,?,?,?,?);";
+  std::string statement = "INSERT INTO STACDB.Classes (ClassName, AdminID, Institution, MeetTimes, StartDate, EndDate, PublicIPAdress) VALUES (?,?,?,?,?,?,?);";
   auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
   p_stmt->setString(1, class_name);
   p_stmt->setInt(2, admin_id);
@@ -207,6 +209,25 @@ int DBI::CreateClass(std::string class_name,
   p_stmt->setString(7, ip_address);
 
   auto record_code = p_stmt->executeUpdate();
+  if(record_code != 0)
+  {
+    return -1;
+  }
 
-  return record_code;
+  statement = "SELECT ID FROM STACDB.Classes WHERE ClassName=? AND AdminID=? AND StartDate=? LIMIT 1;";
+  p_stmt.reset(con->prepareStatement(statement));
+
+  p_stmt->setString(1, class_name);
+  p_stmt->setInt(2, admin_id);
+  p_stmt->setString(3, start_date);
+
+  auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
+  if(res->next())
+  {
+    return res->getInt("ID");
+  }
+  else
+  {
+    return -2;
+  }
 }

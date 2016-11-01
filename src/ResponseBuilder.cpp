@@ -67,18 +67,21 @@ std::string ResponseBuilder::class_search_response(bool is_success, std::vector<
   return ss.str();
 }
 
-std::string ResponseBuilder::class_view_response(bool is_success,
-                                                 int class_id,
-                                                 std::string institution,
-                                                 int admin_id,
-                                                 std::string meetings)
+std::string ResponseBuilder::class_view_response(bool is_success, boost::optional<stac::core::Class> maybe_class)
 {
   std::stringstream ss{};
-  ss << "CDTR " << (is_success ? "S" : "F") << ' '
-     << "\"" << class_id << "\"" << ' '
-     << "\"" << institution << "\"" << ' '
-     << "\"" << admin_id << "\"" << ' '
-     << "\"" << meetings << "\"";
+  if(is_success)
+  {
+    ss << "CDTR " << "S" << ' '
+     << "\"" << maybe_class->id << "\"" << ' '
+     << "\"" << maybe_class->institution << "\"" << ' '
+     << "\"" << maybe_class->admin_id << "\"" << ' '
+     << "\"" << maybe_class->meetings << "\"";
+  }
+  else
+  {
+    ss << "CDTR " << "F";
+  }
 
   return ss.str();
 }
@@ -86,6 +89,13 @@ std::string ResponseBuilder::class_view_response(bool is_success,
 std::string ResponseBuilder::create_class_response(bool is_success, int class_id)
 {
   std::stringstream ss{};
-  ss << "CRER " << (is_success ? "S" : "F") << ' ' << "\"" << class_id << "\"";
+  if(is_success)
+  {
+    ss << "CRER " << "S " << "\"" << class_id << "\"";
+  }
+  else
+  {
+    ss << "CRER " << "F";
+  }
   return ss.str();
 }

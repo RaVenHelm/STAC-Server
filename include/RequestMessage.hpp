@@ -12,7 +12,7 @@ enum class RequestType
   login,
   register_req, // register is a reserved keyword
   logout,
-  create_class,
+  class_create,
   class_view,
   class_search,
   heartbeat,
