@@ -1,5 +1,8 @@
 #include "ResponseBuilder.hpp"
 
+#include <algorithm>
+#include <iterator>
+
 using stac::core::ResponseBuilder;
 
 // Example:
@@ -56,21 +59,35 @@ std::string ResponseBuilder::heartbeat_response()
   return ss.str();
 }
 
-std::string ResponseBuilder::class_search_response(bool is_success, std::vector<int> const& class_ids)
+std::string ResponseBuilder::class_search_response(boost::optional<std::vector<int>> class_ids)
 {
   std::stringstream ss{};
-  ss << "CSRR " << (is_success ? "S" : "F") << ' ';
-  for(auto const id: class_ids)
+  ss << "CSRR ";
+  if(class_ids)
   {
-    ss << "\"" << id << "\"";
+    ss << "S ";
+    std::vector<std::string> id_strings{};
+    // convert the vector<int> to a vector<std::string>
+    std::transform(class_ids->begin(), class_ids->end(), std::back_inserter(id_strings),
+      [&](auto const i)
+      {
+        std::stringstream sstream{};
+        sstream << "\"" << i << "\"";
+        return sstream.str();
+      });
+    std::copy(id_strings.begin(), id_strings.end(), std::ostream_iterator<std::string>(ss, " "));
+  }
+  else
+  {
+    ss << 'F';
   }
   return ss.str();
 }
 
-std::string ResponseBuilder::class_view_response(bool is_success, boost::optional<stac::core::Class> maybe_class)
+std::string ResponseBuilder::class_view_response(boost::optional<stac::core::Class> maybe_class)
 {
   std::stringstream ss{};
-  if(is_success)
+  if(maybe_class)
   {
     ss << "CDTR " << "S" << ' '
      << "\"" << maybe_class->id << "\"" << ' '
@@ -87,10 +104,10 @@ std::string ResponseBuilder::class_view_response(bool is_success, boost::optiona
   return ss.str();
 }
 
-std::string ResponseBuilder::create_class_response(bool is_success, int class_id)
+std::string ResponseBuilder::create_class_response(int class_id)
 {
   std::stringstream ss{};
-  if(is_success)
+  if(class_id > 0)
   {
     ss << "CRER " << "S " << "\"" << class_id << "\"";
   }

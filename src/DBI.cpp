@@ -147,16 +147,18 @@ int DBI::GetUserIdFromName(std::string name)
 std::vector<int> DBI::SelectClassID(std::string class_name, std::string institution)
 {
   std::vector<int> result{};
-  std::string statement = "SELECT ClassID FROM STACDB.Classes WHERE ClassName LIKE '?%' AND Institution LIKE '?%';";
+  std::string statement =
+    "SELECT ClassID FROM STACDB.Classes WHERE ClassName LIKE '" + class_name + "%' AND Institution LIKE '" + institution+ "%';";
 
   auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
-  p_stmt->setString(1, class_name);
-  p_stmt->setString(2, institution);
 
   auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
   while (res->next())
   {
-    result.push_back(res->getInt("ClassID"));
+    auto r1 = res->getInt("ClassID");
+    auto r2 = res->getString("ClassID");
+    (void)r2;
+    result.push_back(r1);
   }
 
   return result;

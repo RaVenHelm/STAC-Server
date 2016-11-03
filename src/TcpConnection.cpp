@@ -87,6 +87,8 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
     auto values = message.values();
     std::cout << "Values received: " << values.size() << '\n';
 
+    // TODO: This portion is starting to get unruly to navigate around
+    // I propose a entire RequestHandler class to delegate request logic and such
     if (type == RequestType::heartbeat)
     {
       out_response = builder.heartbeat_response();
@@ -216,14 +218,10 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       {
         auto cid_str = values[1];
         auto cid = std::stoi(cid_str.c_str(), nullptr, 10);
-        auto is_success = false;
         std::cout << cid << '\n';
         auto res = m_dbi->SelectClassDetails(cid);
-        if(res) {
-          is_success = true;
-        }
 
-        out_response = builder.class_view_response(is_success, res);
+        out_response = builder.class_view_response(res);
       }
       else
       {
@@ -238,11 +236,18 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         auto command = values[0];
         auto clsname = values[1];
         auto cid = values[2];
-        auto is_success = false;
-        auto res = m_dbi->SelectClassID(clsname, cid);
-        is_success = res.size() > 0;
+        auto ids = m_dbi->SelectClassID(clsname, cid);
+        boost::optional<std::vector<int>> res;
+        if(ids.empty())
+        {
+          res = boost::none;
+        }
+        else
+        {
+          res = ids;
+        }
 
-        out_response = builder.class_search_response(is_success, res);
+        out_response = builder.class_search_response(res);
       }
       else
       {
@@ -261,7 +266,6 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         auto end_date = values[4];
         auto ip_address = values[5];
         auto dow_time = values[6];
-        auto is_success = false;
 
         // If the user doens't supply us with one
         if(ip_address.empty())
@@ -273,9 +277,8 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         start_date = stac::utility::reorder_date_format(start_date);
         end_date = stac::utility::reorder_date_format(end_date);
         auto res = m_dbi->CreateClass(clsname, m_id, instit, start_date, end_date, ip_address, dow_time, class_id);
-        is_success = res > 0;
 
-        out_response = builder.create_class_response(is_success, res);
+        out_response = builder.create_class_response(res);
       }
       else
       {
