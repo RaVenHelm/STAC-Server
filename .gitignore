@@ -8,6 +8,7 @@ include/json
 .vscode
 *.conf
 tags
+*.sql
 
 *.cmake.txt
 

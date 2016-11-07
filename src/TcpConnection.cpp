@@ -257,7 +257,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
 
     if (type == RequestType::class_create)
     {
-      if (m_is_admin_session == true && m_is_logged_in)
+      if (m_is_admin_session && m_is_logged_in)
       {
         auto command = values[0];
         auto clsname = values[1];
