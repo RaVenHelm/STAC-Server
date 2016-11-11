@@ -210,8 +210,6 @@ int DBI::CreateClass(std::string class_name,
   p_stmt->setString(7, ip_address);
   p_stmt->setInt(8, class_id);
 
-  auto record_code = p_stmt->executeUpdate();
-  (void)record_code;
-  
+  p_stmt->executeUpdate();
   return class_id;
 }
