@@ -16,6 +16,10 @@ enum class RequestType
   class_view,
   class_search,
   heartbeat,
+  enroll,
+  drop,
+  class_list,
+  enroll_list,
   invalid
 };
 

@@ -235,8 +235,8 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       {
         auto command = values[0];
         auto clsname = values[1];
-        auto cid = values[2];
-        auto ids = m_dbi->SelectClassID(clsname, cid);
+        auto institution = values[2];
+        auto ids = m_dbi->SelectClassID(clsname, institution);
         boost::optional<std::vector<int>> res;
         if(ids.empty())
         {
@@ -285,6 +285,77 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         out_response = builder.error_response("No user logged in or the user is not an admin!");
       }
     }
+
+    if(type == RequestType::enroll_list)
+    {
+      if(!m_is_logged_in)
+      {
+        out_response = builder.error_response("Enroll List: Not logged in.");
+      }
+      else if(m_is_admin_session)
+      {
+        out_response = builder.error_response("Enroll List: Admins are not allowed to view enrolled list");
+      }
+      else
+      {
+        //stub out DBI enroll list
+        std::vector<int> ids = {2016012345, 2016856001, 2016856002};
+        out_response = builder.enroll_list_response(ids);
+      }
+    }
+
+    if(type == RequestType::class_list)
+    {
+      if(!m_is_logged_in)
+      {
+        out_response = builder.error_response("Created Class List: Not logged in.");
+      }
+      else if(!m_is_admin_session)
+      {
+        out_response = builder.error_response("Created Class List: Users are not allowed to view admin's created class list.");
+      }
+      else
+      {
+        //stub out DBI created class list
+        std::vector<int> ids = {2016012345, 2016856001, 2016856002};
+        out_response = builder.class_list_response(ids);
+      }
+    }
+
+    if(type == RequestType::enroll)
+    {
+      if(!m_is_logged_in)
+      {
+        out_response = builder.error_response("Enroll: Not logged in.");
+      }
+      else if(m_is_admin_session)
+      {
+        out_response = builder.error_response("Enroll: Only Users are allowed to enroll in a class.");
+      }
+      else
+      {
+        //stub out DBI enroll user
+        out_response = builder.enroll_response(true);
+      }
+    }
+
+    if(type == RequestType::drop)
+    {
+      if(!m_is_logged_in)
+      {
+        out_response = builder.error_response("Drop class: Not logged in.");
+      }
+      else if(m_is_admin_session)
+      {
+        out_response = builder.error_response("Drop class: Only users are allowed to drop a class.");
+      }
+      else
+      {
+        //stub out DBI drop class
+        out_response = builder.drop_response(true);
+      }
+    }
+
   }
   catch (std::exception &err)
   {

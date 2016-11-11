@@ -117,3 +117,59 @@ std::string ResponseBuilder::create_class_response(int class_id)
   }
   return ss.str();
 }
+
+std::string ResponseBuilder::enroll_response(bool is_success)
+{
+  std::stringstream ss{};
+  ss << "ENRR " << (is_success ? 'S' : 'F');
+  return ss.str();
+}
+
+std::string ResponseBuilder::drop_response(bool is_success)
+{
+  std::stringstream ss{};
+  ss << "CDRR " << (is_success ? 'S' : 'F');
+  return ss.str();
+}
+
+std::string ResponseBuilder::enroll_list_response(boost::optional<std::vector<int>> class_ids)
+{
+  std::stringstream ss{};
+  ss << "ELSR ";
+  if(!class_ids)
+  {
+    ss << 'F';
+  }
+  else
+  {
+    auto ids = *class_ids;
+    ss << "S ";
+    std::for_each(ids.begin(), ids.end(),
+      [&](auto const i)
+      {
+        ss << "\"" << i << "\" ";
+      });
+  }
+  return ss.str();
+}
+
+std::string ResponseBuilder::class_list_response(boost::optional<std::vector<int>> class_ids)
+{
+  std::stringstream ss{};
+  ss << "CLSR ";
+  if(!class_ids)
+  {
+    ss << 'F';
+  }
+  else
+  {
+    auto ids = *class_ids;
+    ss << "S ";
+    std::for_each(ids.begin(), ids.end(),
+      [&](auto const i)
+      {
+        ss << "\"" << i << "\" ";
+      });
+  }
+  return ss.str();
+}

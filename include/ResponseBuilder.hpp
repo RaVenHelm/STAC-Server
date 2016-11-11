@@ -24,6 +24,10 @@ struct ResponseBuilder
   std::string class_search_response(boost::optional<std::vector<int>> class_ids);
   std::string class_view_response(boost::optional<stac::core::Class> maybe_class);
   std::string create_class_response(int class_id);
+  std::string enroll_response(bool is_success);
+  std::string drop_response(bool is_success);
+  std::string enroll_list_response(boost::optional<std::vector<int>> class_ids);
+  std::string class_list_response(boost::optional<std::vector<int>> class_ids);
   std::string heartbeat_response();
 };
 }
