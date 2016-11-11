@@ -166,7 +166,7 @@ std::vector<int> DBI::SelectClassID(std::string class_name, std::string institut
 
 boost::optional<stac::core::Class> DBI::SelectClassDetails(int class_id)
 {
-  std::string statement = "SELECT * FROM STACDB.Classes WHERE ClassID=?;";
+  std::string statement = "SELECT ClassID, ClassName, Institution, MeetTimes, StartDate, EndDate, PublicIPAddress, UName FROM stacdb.classes LEFT JOIN stacdb.admins on stacdb.classes.AdminID = stacdb.admins.ID WHERE ClassID=" + std::to_string(class_id) + ";";
   auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
   p_stmt->setInt(1, class_id);
 
@@ -175,13 +175,13 @@ boost::optional<stac::core::Class> DBI::SelectClassDetails(int class_id)
   {
     auto id = res->getInt("ClassID");
     auto name = res->getString("ClassName");
-    auto admin_id = res->getInt("AdminID");
+    auto admin_name = res->getString("UName");
     auto institution = res->getString("Institution");
     auto meet_time = res->getString("MeetTimes");
     auto start_date = res->getString("StartDate");
     auto end_date = res->getString("EndDate");
     auto ip = res->getString("PublicIPAddress");
-    stac::core::Class cls{id, name, institution, admin_id, meet_time, start_date, end_date, ip};
+    stac::core::Class cls{id, name, institution, admin_name, meet_time, start_date, end_date, ip};
     return cls;
   }
   else
@@ -212,16 +212,6 @@ int DBI::CreateClass(std::string class_name,
 
   auto record_code = p_stmt->executeUpdate();
   (void)record_code;
-  statement = "SELECT ClassID FROM STACDB.Classes WHERE ClassName='" + class_name + "' AND AdminID=" + std::to_string(admin_id) + " AND StartDate='" + start_date + "';";
-  p_stmt.reset(con->prepareStatement(statement));
-
-  auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
-  if(res->next())
-  {
-    return res->getInt("ClassID");
-  }
-  else
-  {
-    return -2;
-  }
+  
+  return class_id;
 }

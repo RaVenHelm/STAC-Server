@@ -12,7 +12,7 @@ struct Class
   int id;
   std::string name;
   std::string institution;
-  int admin_id;
+  std::string admin_name;
   std::string meetings;
   std::string start_date;
   std::string end_date;

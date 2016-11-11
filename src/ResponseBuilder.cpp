@@ -93,7 +93,7 @@ std::string ResponseBuilder::class_view_response(boost::optional<stac::core::Cla
      << "\"" << maybe_class->id << "\"" << ' '
      << "\"" << maybe_class->institution << "\"" << ' '
      << "\"" << maybe_class->name << "\"" << ' '
-     << "\"" << maybe_class->admin_id << "\"" << ' '
+     << "\"" << maybe_class->admin_name << "\"" << ' '
      << "\"" << maybe_class->meetings << "\"";
   }
   else
