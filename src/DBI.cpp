@@ -213,3 +213,95 @@ int DBI::CreateClass(std::string class_name,
   p_stmt->executeUpdate();
   return class_id;
 }
+
+int DBI::RemoveUserFromEnrolledClass(std::string crn, std::string username)
+{
+  int res = 0;
+  int userID = 0;
+  std::string statement = "SELECT `ID` FROM STACDB.Users WHERE `UName` = '" + username + "';";
+  auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+  auto res_set = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+  while (res_set->next()) {
+    userID = res_set->getInt("ID");
+  }
+  statement =
+    "DELETE FROM STACDB.Enrollment WHERE `UserID`='" +
+      std::to_string(userID) + "' and`ClassID`='" + crn + "';";
+  stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+  stmt->execute(statement);
+  return res;
+}
+
+std::vector<int> DBI::UserSelectClass(std::string username)
+{
+  std::string statement = "SELECT `ID` FROM STACDB.Users WHERE `UName` = '" + username + "';";
+  auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+  auto res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+  auto userID = 0;
+  std::vector<int> ids{};
+  while (res->next()) {
+    userID = res->getInt("ID");
+  }
+  statement = "SELECT `ClassID` from STACDB.Enrollment where UserID ='" + std::to_string(userID) + "';";
+  stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+  res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+  while (res->next()) {
+    auto classID = res->getInt("ClassID");
+    ids.push_back(classID);
+  }
+  return ids;
+}
+
+std::vector<int> DBI::AdminSelectClass(std::string username)
+{
+  std::string statement = "SELECT `ID` FROM STACDB.Admins WHERE `UName` = '" + username + "';";
+  auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+  auto res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+  int userID = 0;
+  std::vector<int> result{};
+  while (res->next()) {
+    userID = res->getInt("ID");
+  }
+  statement = "SELECT `ClassID` from STACDB.Classes where AdminID ='" + std::to_string(userID) + "';";
+  stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+  res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+  while (res->next()) {
+    auto classID = res->getInt("ClassID");
+    result.push_back(classID);
+  }
+  return result;
+}
+
+int DBI::InsertUserIntoEnrollment(std::string crn,
+                                  std::string username,
+                                  std::string deviceID,
+                                  std::string deviceFlag)
+{
+  int r = 0;
+  int userID = 0;
+  std::string statement{};
+  
+  deviceID = "FF:FF:FF:FF:FF:FF";
+  deviceFlag = "0";
+  try {
+    statement = "SELECT `ID` FROM STACDB.Users WHERE `UName` = '" + username + "';";
+    auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+    auto res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+    while (res->next()) {
+      userID = res->getInt("ID");
+    }
+    statement =
+      "INSERT INTO STACDB.Enrollment (`UserID`, `ClassID`, `DeviceID`, `DeviceChangeFlag`) VALUES('" +
+        std::to_string(userID) + "', '" +
+        crn + "', '" +
+        deviceID + "', '" +
+        deviceFlag + "');";
+    stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+    stmt->execute(statement);
+  }
+  catch (sql::SQLException &e) {
+    r = 1;
+    print_sql_error(std::cout, e);
+  }
+  return r;
+}

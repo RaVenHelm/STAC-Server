@@ -49,6 +49,13 @@ public:
   int GetUserIdFromName(std::string name);
   std::vector<int> SelectClassID(std::string class_name, std::string institution);
   boost::optional<stac::core::Class> SelectClassDetails(int class_id);
+  int RemoveUserFromEnrolledClass(std::string crn, std::string username);
+  std::vector<int> UserSelectClass(std::string username);
+  std::vector<int> AdminSelectClass(std::string username);
+  int InsertUserIntoEnrollment(std::string crn,
+                               std::string username,
+                               std::string deviceID,
+                               std::string deviceFlag);
   int CreateClass(std::string class_name,
                   int admin_id,
                   std::string institution,
