@@ -1,6 +1,7 @@
 #include "Utility.hpp"
 
 #include <random>
+#include <regex>
 
 namespace stac { namespace utility
 {
@@ -38,6 +39,22 @@ namespace stac { namespace utility
     }
 
     return std::stoi(ss.str());
+  }
+
+  std::string extract_class_meetings(std::string msg)
+  {
+    static const std::regex pattern {"^CRCR\\s\".+\"\\s\".+\"\\s\".+\"\\s\".*\"\\s\".+\"\\s\"(.+)\"\\s*"};
+    std::string result{};
+    std::smatch matches{};
+
+    if(std::regex_match(msg, matches, pattern))
+    {
+      if(matches.size() == 2)
+      {
+        result = matches[1].str();
+      }
+    }
+    return result;
   }
 } // utility
 } // stac

@@ -219,9 +219,10 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         auto cid_str = values[1];
         auto cid = std::stoi(cid_str.c_str(), nullptr, 10);
         std::cout << cid << '\n';
-        auto res = m_dbi->SelectClassDetails(cid);
-
-        out_response = builder.class_view_response(res);
+        // auto res = m_dbi->SelectClassDetails(cid);
+        // out_response = builder.class_view_response(res);
+        
+        out_response = std::string { "CDTR S \"2016012345\" \"TestName\" \"UNC-Test\" \"admintest\" \"08-08-2018\" \"12-12-2019\" \"1.2.3.4\" \"M1030-1130;W1030-1130;F1030-1130\""};
       }
       else
       {
@@ -265,7 +266,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         auto start_date = values[3];
         auto end_date = values[4];
         auto ip_address = values[5];
-        auto dow_time = values[6];
+        auto dow_time = values.back();
 
         // If the user doens't supply us with one
         if(ip_address.empty())

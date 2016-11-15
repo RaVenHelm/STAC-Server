@@ -6,6 +6,8 @@
 #include <iterator>
 #include <algorithm>
 
+#include "Utility.hpp"
+
 // The "\s*"'s' at the end for random whitespace characters that may come from
 // Programs like netcat or Java
 static const std::map<RequestType, std::regex> regex_map = {
@@ -61,6 +63,11 @@ RequestMessage::RequestMessage(std::string message)
     auto values = std::vector<std::string>{};
 
     std::copy(matches.begin() + 1, matches.end(), std::back_inserter(values));
+
+    if(type == RequestType::class_create)
+    {
+      values.push_back(stac::utility::extract_class_meetings(matches[0].str()));
+    }
     m_values = values;
   }
 }

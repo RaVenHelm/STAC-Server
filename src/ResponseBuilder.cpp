@@ -94,6 +94,9 @@ std::string ResponseBuilder::class_view_response(boost::optional<stac::core::Cla
      << "\"" << maybe_class->institution << "\"" << ' '
      << "\"" << maybe_class->name << "\"" << ' '
      << "\"" << maybe_class->admin_name << "\"" << ' '
+     << "\"" << maybe_class->start_date << "\"" << ' '
+     << "\"" << maybe_class->end_date << "\"" << ' '
+     << "\"" << maybe_class->ip_address << "\"" << ' '
      << "\"" << maybe_class->meetings << "\"";
   }
   else
