@@ -298,8 +298,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       }
       else
       {
-        //stub out DBI enroll list
-        std::vector<int> ids = {2016012345, 2016856001, 2016856002};
+        auto ids = m_dbi->UserSelectClass(m_username);
         out_response = builder.enroll_list_response(ids);
       }
     }
@@ -316,8 +315,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       }
       else
       {
-        //stub out DBI created class list
-        std::vector<int> ids = {2016012345, 2016856001, 2016856002};
+        auto ids = m_dbi->AdminSelectClass(m_username);
         out_response = builder.class_list_response(ids);
       }
     }
@@ -334,8 +332,10 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       }
       else
       {
-        //stub out DBI enroll user
-        out_response = builder.enroll_response(true);
+        auto class_id = values[1];
+        auto device_id = values[2];
+        auto res = m_dbi->InsertUserIntoEnrollment(class_id, m_username, device_id, "1");
+        out_response = builder.enroll_response(res == 0);
       }
     }
 
@@ -351,8 +351,9 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       }
       else
       {
-        //stub out DBI drop class
-        out_response = builder.drop_response(true);
+        auto class_id = values[1];
+        auto res = m_dbi->RemoveUserFromEnrolledClass(class_id, m_username);
+        out_response = builder.drop_response(res == 0);
       }
     }
 

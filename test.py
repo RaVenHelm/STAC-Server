@@ -74,6 +74,8 @@ def main():
         return
     
     print(msg.strip())
+
+
     s.close()
 
 if __name__ == '__main__':
