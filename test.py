@@ -27,7 +27,9 @@ def main():
     s.connect((host, 1025))
     hrbt = 'HRBT'
     loga = 'LOGA "ejohn" "rocketman"'
+    logu = 'LOGU "ejohn" "rocketman"'
     cls_list = 'CLST'
+    logo = 'LOGO'
 
     msg_buff = b''
     msg      = ''
@@ -75,7 +77,36 @@ def main():
     
     print(msg.strip())
 
+    # Log out admin
+    debug(logo)
+    s.send(logo.encode())
+    msg_buff = s.recv(MSG_SIZE)
+    msg = msg_buff.decode()
 
+    # Logout
+    expected = 'LOGO S'
+    if msg.strip() != expected:
+        msg_err(expected, msg)
+        close(s)
+        return
+    
+    print(msg.strip())
+
+    s.connect((host, 1025))
+
+    # Log in user
+    debug(logu)
+    s.send(logu.encode())
+    msg_buff = s.recv(MSG_SIZE)
+    msg = msg_buff.decode()
+
+    # Login
+    expected = 'LOGR S'
+    if msg.strip() != expected:
+        msg_err(expected, msg)
+        close(s)
+        return
+    
     s.close()
 
 if __name__ == '__main__':
