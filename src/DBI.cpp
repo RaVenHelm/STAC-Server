@@ -166,7 +166,7 @@ std::vector<int> DBI::SelectClassID(std::string class_name, std::string institut
 
 boost::optional<stac::core::Class> DBI::SelectClassDetails(int class_id)
 {
-  std::string statement = "SELECT ClassID, ClassName, Institution, MeetTimes, StartDate, EndDate, PublicIPAddress, UName FROM stacdb.classes LEFT JOIN stacdb.admins on stacdb.classes.AdminID = stacdb.admins.ID WHERE ClassID=" + std::to_string(class_id) + ";";
+  std::string statement = "SELECT ClassID, ClassName, Institution, MeetTimes, StartDate, EndDate, PublicIPAddress, UName FROM stacdb.Classes LEFT JOIN stacdb.Admins on stacdb.Classes.AdminID = stacdb.Admins.ID WHERE ClassID=" + std::to_string(class_id) + ";";
   auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
   p_stmt->setInt(1, class_id);
 
