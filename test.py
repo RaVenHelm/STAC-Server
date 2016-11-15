@@ -28,6 +28,7 @@ def main():
     hrbt = 'HRBT'
     loga = 'LOGA "ejohn" "rocketman"'
     logu = 'LOGU "ejohn" "rocketman"'
+    create_class = 'CRCR "TestClass" "UNC-Test" "08-08-2016" "12-12-2112" "1.2.3.4" "T1230-1545;R1425-1725"'
     cls_list = 'CLST'
     logo = 'LOGO'
 
@@ -70,6 +71,21 @@ def main():
     msg = msg_buff.decode()
 
     expected = 'CLSR S'
+    if not msg.startswith(expected):
+        msg_err(expected, msg)
+        close(s)
+        return
+    
+    print(msg.strip())
+
+    # Create class
+    debug(create_class)
+
+    s.send(create_class.encode())
+    msg_buff = s.recv(MSG_SIZE)
+    msg = msg_buff.decode()
+
+    expected = 'CRER S'
     if not msg.startswith(expected):
         msg_err(expected, msg)
         close(s)
