@@ -28,7 +28,7 @@ def main():
     hrbt = 'HRBT'
     loga = 'LOGA "ejohn" "rocketman"'
     logu = 'LOGU "ejohn" "rocketman"'
-    create_class = 'CRCR "TestClass" "UNC-Test" "08-08-2016" "12-12-2112" "1.2.3.4" "T1230-1545;R1425-1725"'
+    create_class = 'CRCR "Games Without Frontiers" "UNC-Test" "08-08-2016" "12-12-2112" "1.2.3.4" "T1230-1545;R1425-1725"'
     cls_list = 'CLST'
     logo = 'LOGO'
 
@@ -75,23 +75,32 @@ def main():
         msg_err(expected, msg)
         close(s)
         return
+    else:
+        parts = msg.split(' ')
+        ids = [part for part in parts if len(part) == 12]
+        for class_id in ids:
+            cdtl = "CDTL " + class_id
+            cdtl.strip()
+            s.send(cdtl.encode())
+            buf = s.recv(2048)
+            print(buf.decode())
     
     print(msg.strip())
 
     # Create class
-    debug(create_class)
+    # debug(create_class)
 
-    s.send(create_class.encode())
-    msg_buff = s.recv(MSG_SIZE)
-    msg = msg_buff.decode()
+    # s.send(create_class.encode())
+    # msg_buff = s.recv(MSG_SIZE)
+    # msg = msg_buff.decode()
 
-    expected = 'CRER S'
-    if not msg.startswith(expected):
-        msg_err(expected, msg)
-        close(s)
-        return
+    # expected = 'CRER S'
+    # if not msg.startswith(expected):
+    #     msg_err(expected, msg)
+    #     close(s)
+    #     return
     
-    print(msg.strip())
+    # print(msg.strip())
 
     # Log out admin
     debug(logo)
@@ -107,21 +116,6 @@ def main():
         return
     
     print(msg.strip())
-
-    s.connect((host, 1025))
-
-    # Log in user
-    debug(logu)
-    s.send(logu.encode())
-    msg_buff = s.recv(MSG_SIZE)
-    msg = msg_buff.decode()
-
-    # Login
-    expected = 'LOGR S'
-    if msg.strip() != expected:
-        msg_err(expected, msg)
-        close(s)
-        return
     
     s.close()
 

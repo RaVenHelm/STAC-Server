@@ -91,8 +91,8 @@ std::string ResponseBuilder::class_view_response(boost::optional<stac::core::Cla
   {
     ss << "CDTR " << "S" << ' '
      << "\"" << maybe_class->id << "\"" << ' '
-     << "\"" << maybe_class->institution << "\"" << ' '
      << "\"" << maybe_class->name << "\"" << ' '
+     << "\"" << maybe_class->institution << "\"" << ' '
      << "\"" << maybe_class->admin_name << "\"" << ' '
      << "\"" << maybe_class->start_date << "\"" << ' '
      << "\"" << maybe_class->end_date << "\"" << ' '
