@@ -43,7 +43,7 @@ namespace stac { namespace utility
 
   std::string extract_class_meetings(std::string msg)
   {
-    static const std::regex pattern {"^CRCR\\s\".+\"\\s\".+\"\\s\".+\"\\s\".*\"\\s\".+\"\\s\"(.+)\"\\s*"};
+    static const std::regex pattern {"^CRCR\\s\".+\"\\s\".+\"\\s\".+\"\\s\".+\"\\s\".*\"\\s\"(.+)\"\\s*"};
     std::string result{};
     std::smatch matches{};
 
