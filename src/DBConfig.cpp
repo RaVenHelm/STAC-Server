@@ -14,6 +14,8 @@ stac::config::DBConfig stac::config::load_db_config_from_file(std::string const&
   std::ifstream file{ filename };
   std::vector<std::string> lines;
   std::string line{};
+
+  std::cout << "Reading from conf file: " << filename << '\n';
   while(std::getline(file, line))
   {
     lines.push_back(line);

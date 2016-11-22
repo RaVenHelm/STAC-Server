@@ -402,6 +402,7 @@ void TcpConnection::write_complete(boost::system::error_code &error, size_t /*by
 void TcpConnection::send(std::string msg)
 {
   std::cout << "Sending message: " << msg << '\n';
+  boost::trim_all(msg);
   std::copy(msg.begin(), msg.end(), std::back_inserter(m_out_packet));
   m_out_packet.push_back('\n');
   write_to_socket();
