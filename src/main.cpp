@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
     std::string conf_name{"stac.conf"};
 
     desc.add_options()
+      ("help,h", "Get help")
       ("thread-count", options::value<unsigned int>(&thread_count)->default_value(1))
       ("conf-name,c", options::value<std::string>(&conf_name)->default_value(std::string{"stac.conf"}))
       ("port,p", options::value<unsigned short>(&port)->default_value(1025))
@@ -31,6 +32,12 @@ int main(int argc, char *argv[]) {
     options::variables_map vm{};
     options::store(options::parse_command_line(argc, argv, desc), vm);
     options::notify(vm);
+
+    if(vm.count("help")) {
+      std::cout << "Program Options:\n";
+      std::cout << desc << '\n';
+      return 0;
+    }
 
     boost::filesystem::path path{ conf_name.c_str() };
     auto abs_path = boost::filesystem::absolute(path);
