@@ -14,6 +14,7 @@ using stac::tcpip::TcpServer;
 using stac::tcpip::TcpConnection;
 
 namespace options = boost::program_options;
+
 int main(int argc, char *argv[]) {
   options::options_description desc{"STAC command line configuration options"};
 

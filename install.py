@@ -14,7 +14,8 @@ def download_and_install():
     deps = [
         'http://zlib.net/zlib-1.2.8.tar.gz',
         'http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz',
-        'http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.tar.gz'
+        'http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.tar.gz',
+        'https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-1.1.7-linux-ubuntu12.04-x86-64bit.tar.gz'
     ]
 
     for url in deps:
