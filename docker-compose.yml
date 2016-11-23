@@ -1,0 +1,14 @@
+version: '2'
+services:
+  db:
+    container_name: stac-db
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=STACDB
+      - MYSQL_USER=SEClass
+      - MYSQL_PASSWORD=BearsRock
+    volumes: 
+      - ./data:/docker-entrypoint-initdb.d
