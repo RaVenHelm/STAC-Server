@@ -176,3 +176,59 @@ std::string ResponseBuilder::class_list_response(boost::optional<std::vector<int
   }
   return ss.str();
 }
+
+std::string ResponseBuilder::user_attend_response(bool is_success)
+{
+  std::stringstream ss{};
+  ss << "ATTR " << (is_success ? 'S' : 'F');
+  return ss.str();
+}
+
+std::string ResponseBuilder::manual_attend_response(bool is_success)
+{
+  std::stringstream ss{};
+  ss << "MTTR " << (is_success ? 'S' : 'F');
+  return ss.str();
+}
+
+std::string ResponseBuilder::check_attendance_response(boost::optional<std::vector<std::string>> attendance_times)
+{
+  std::stringstream ss{};
+  ss << "CCHR ";
+  if(!attendance_times)
+  {
+    ss << 'F';
+  }
+  else
+  {
+    auto times = *attendance_times;
+    ss << "S ";
+    std::for_each(times.begin(), times.end(),
+      [&](auto const t)
+      {
+        ss << "\"" << t << "\" ";
+      });
+  }
+  return ss.str();
+}
+
+std::string ResponseBuilder::attendance_report_response(boost::optional<std::vector<std::string>> attendance_list)
+{
+  std::stringstream ss{};
+  ss << "ATRR ";
+  if(!attendance_list)
+  {
+    ss << 'F';
+  }
+  else
+  {
+    auto attendance = *attendance_list;
+    ss << "S ";
+    std::for_each(attendance.begin(), attendance.end(),
+      [&](auto const i)
+      {
+        ss << "\"" << i << "\" ";
+      });
+  }
+  return ss.str();
+}

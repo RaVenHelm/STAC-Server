@@ -21,7 +21,11 @@ static const std::map<RequestType, std::regex> regex_map = {
   {RequestType::enroll, std::regex{"^(ENRL)\\s\"([0-9]{10})\"\\s\"([0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2})\"\\s*$"}},
   {RequestType::drop, std::regex{"^(CDRP)\\s\"([0-9]{10})\"\\s*$"}},
   {RequestType::enroll_list, std::regex{"^(ELST)\\s*$"}},
-  {RequestType::class_list, std::regex{"^(CLST)\\s*$"}}
+  {RequestType::class_list, std::regex{"^(CLST)\\s*$"}},
+  {RequestType::attend, std::regex{"^(ATTN)\\s\"([0-9]{10})\"\\s\"([0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2})\"\\s\"(\\d{2}-\\d{2}-\\d{4})\"\\s\"(\\d{2}\\d{2})\"\\s*$"}},
+  {RequestType::manual_attend, std::regex{"^(MTTN)\\s\"([0-9]{10})\"\\s\"([A-z0-9]+)\"\\s\"(\\d{2}-\\d{2}-\\d{4})\"\\s\"(\\d{2}\\d{2})\"\\s*$"}},
+  {RequestType::check_attendance, std::regex{"^(CCHK)\\s\"([0-9]{10})\"\\s*$"}},
+  {RequestType::class_attendance, std::regex{"^(ATRP)\\s\"([0-9]{10})\"\\s*$"}}
 };
 
 // TODO: Maybe make this a private static member function (?)

@@ -28,6 +28,10 @@ struct ResponseBuilder
   std::string drop_response(bool is_success);
   std::string enroll_list_response(boost::optional<std::vector<int>> class_ids);
   std::string class_list_response(boost::optional<std::vector<int>> class_ids);
+  std::string user_attend_response(bool is_success);
+  std::string manual_attend_response(bool is_success);
+  std::string check_attendance_response(boost::optional<std::vector<std::string>> attendance_times);
+  std::string attendance_report_response(boost::optional<std::vector<std::string>> attendance_list);
   std::string heartbeat_response();
 };
 }

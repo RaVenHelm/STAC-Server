@@ -20,6 +20,10 @@ enum class RequestType
   drop,
   class_list,
   enroll_list,
+  attend,
+  manual_attend,
+  check_attendance,
+  class_attendance,
   invalid
 };
 

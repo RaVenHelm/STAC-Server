@@ -356,6 +356,116 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       }
     }
 
+    if(type == RequestType::attend)
+    {
+      if(!m_is_logged_in)
+      {
+        out_response = builder.error_response("Attend class: Not logged in.");
+      }
+      else if(m_is_admin_session)
+      {
+        out_response = builder.error_response("Attend class: Invalid operation for an admin, use manual attendance.");
+      }
+      else
+      {
+        auto class_id = values[1];
+        auto device_id = values[2];
+        auto attn_date = values[3];
+        auto attn_time = values[4];
+
+        (void)class_id;
+        (void)device_id;
+        (void)attn_date;
+        (void)attn_time;
+
+        // DBI part would go here
+        int res = 0;
+
+        out_response = builder.user_attend_response(res == 0);
+      }
+    }
+
+    if(type == RequestType::manual_attend)
+    {
+      if(!m_is_logged_in)
+      {
+        out_response = builder.error_response("Manually attend class: Not logged in.");
+      }
+      else if(!m_is_admin_session)
+      {
+        out_response = builder.error_response("Manually attend class: Only an admin can manually attend.");
+      }
+      else
+      {
+        auto class_id = values[1];
+        auto user_id = values[2];
+        auto attn_date = values[3];
+        auto attn_time = values[4];
+
+        (void)class_id;
+        (void)user_id;
+        (void)attn_date;
+        (void)attn_time;
+
+        // DBI part would go here
+        int res = 0;
+
+        out_response = builder.manual_attend_response(res == 0);
+      }
+    }
+
+    if(type == RequestType::check_attendance)
+    {
+      if(!m_is_logged_in)
+      {
+        out_response = builder.error_response("Check attendance: Not logged in.");
+      }
+      else if(m_is_admin_session)
+      {
+        out_response = builder.error_response("Check attendance: Invalid operation for an admin, use the class report.");
+      }
+      else
+      {
+        auto class_id = values[1];
+
+        (void)class_id;
+
+        std::vector<std::string> dates {
+          "07/12/2016",
+          "07/14/2016",
+          "07/16/2016"
+        };
+
+        out_response = builder.check_attendance_response(dates);
+      }
+    }
+
+    if(type == RequestType::class_attendance)
+    {
+      if(!m_is_logged_in)
+      {
+        out_response = builder.error_response("Class attendance report: Not logged in.");
+      }
+      else if(!m_is_admin_session)
+      {
+        out_response = builder.error_response("Class attendance report: Only admins can get a class report.");
+      }
+      else
+      {
+        auto class_id = values[1];
+
+        std::vector<std::string> aggregate {
+          "131;7",
+          "146;6",
+          "88;2"
+        };
+
+        (void)class_id;
+
+        out_response = builder.check_attendance_response(aggregate);
+      }
+    }
+
   }
   catch (std::exception &err)
   {
