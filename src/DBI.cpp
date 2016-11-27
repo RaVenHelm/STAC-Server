@@ -148,7 +148,7 @@ std::vector<int> DBI::SelectClassID(std::string class_name, std::string institut
 {
   std::vector<int> result{};
   std::string statement =
-    "SELECT ClassID FROM STACDB.Classes WHERE ClassName LIKE '" + class_name + "%' AND Institution LIKE '" + institution+ "%';";
+    "SELECT ClassID FROM STACDB.Classes WHERE ClassName LIKE '%" + class_name + "%' AND Institution LIKE '%" + institution+ "%';";
 
   auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(statement));
 
@@ -280,7 +280,6 @@ int DBI::InsertUserIntoEnrollment(std::string crn,
   int userID = 0;
   std::string statement{};
   
-  deviceID = "FF:FF:FF:FF:FF:FF";
   deviceFlag = "0";
   try {
     statement = "SELECT `ID` FROM STACDB.Users WHERE `UName` = '" + username + "';";
@@ -295,7 +294,7 @@ int DBI::InsertUserIntoEnrollment(std::string crn,
         crn + "', '" +
         deviceID + "', '" +
         deviceFlag + "');";
-    stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+    stmt.reset(con->createStatement());
     stmt->execute(statement);
   }
   catch (sql::SQLException &e) {
@@ -303,4 +302,228 @@ int DBI::InsertUserIntoEnrollment(std::string crn,
     print_sql_error(std::cout, e);
   }
   return r;
+}
+
+boost::optional<std::string> DBI::GetUserDeviceID(std::string class_id, std::string username)
+{
+  std::string query = "select enr.DeviceID from Enrollment enr inner join Users u on enr.UserID = u.ID where u.UName='" + username + "' and enr.ClassID= " + class_id + ";";
+  auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(query));
+  auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
+  if(res->next())
+  {
+    auto id = res->getString("DeviceID");
+    return id;
+  }
+
+  return boost::none;
+}
+
+boost::optional<std::string> DBI::GetUsernameFromID(std::string user_id)
+{
+  std::string query = "select UName from Users where ID=" + user_id + ";";
+  auto p_stmt = std::unique_ptr<sql::PreparedStatement>(con->prepareStatement(query));
+  auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
+  if(res->next())
+  {
+    auto id = res->getString("UName");
+    return id;
+  }
+  return boost::none;
+}
+
+int DBI::InsertUserIntoAttendance(std::string crn, std::string username, std::string attnDate, std::string attnTime)
+{
+  int r{0};
+  std::string statement{};
+  std::string UsersUserID{};
+  std::string EnrollmentUserID{};
+  std::string token{};
+  std::string month{};
+  std::string day{};
+  std::string year{};
+
+  month = attnDate.substr(0, 2);
+  day = attnDate.substr(3, 2);
+  year = attnDate.substr(6, 4);
+
+  std::string timestamp = year + "-" + month + "-" + day + " " + attnTime;
+
+  try
+  {
+    statement = "SELECT `ID` FROM STACDB.Users WHERE `UName` = '" + username + "';";
+    auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+    auto res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+
+    while (res->next())
+    {
+      UsersUserID = res->getString("ID");
+    }
+
+    statement = "SELECT `UserID` FROM STACDB.Enrollment WHERE `ClassID` = '" + crn + "' AND `UserID` = '" + UsersUserID + "' ;";
+    stmt.reset(con->createStatement());
+    res.reset(stmt->executeQuery(statement));
+
+    while (res->next())
+    {
+      EnrollmentUserID = res->getString("UserID");
+    }
+
+    if (UsersUserID == EnrollmentUserID)
+    {
+      statement = "INSERT INTO STACDB.Attendance (`UserID`, `ClassID`, `AttnTime`) VALUES('" + UsersUserID + "', '" + crn + "', '" + timestamp + "');";
+      stmt.reset(con->createStatement());
+      stmt->execute(statement);
+    }
+    else
+    {
+      r = 1;
+    }
+  }
+  catch (sql::SQLException &e)
+  {
+    r = 2;
+    print_sql_error(std::cout, e);
+  }
+
+  return r;
+}
+
+std::vector<std::string> DBI::SelectAttendanceDetailsUser(std::string classid, std::string username)
+{
+  std::vector<std::string> resultV{};
+  std::string statement{};
+  std::string result{};
+  std::string attnTime{};
+  std::string attnYear{};
+  std::string attnMonth{};
+  std::string attnDay{};
+  std::string attnDate{};
+  std::string userID{};
+
+  statement = "SELECT `ID` FROM STACDB.Users WHERE `UName` = '" + username + "';";
+  auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+  auto res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+
+  while (res->next())
+  {
+    userID = res->getString("ID");
+  }
+
+  statement = "SELECT `AttnTime` FROM STACDB.Attendance WHERE `ClassID` = '" + classid + "' AND `UserID` = '" + userID + "' ;";
+  stmt.reset(con->createStatement());
+  res.reset(stmt->executeQuery(statement));
+
+  while(res->next())
+  {
+    attnTime = res->getString("AttnTime");
+    attnYear = attnTime.substr(0, 4);
+    attnMonth = attnTime.substr(5, 2);
+    attnDay = attnTime.substr(8, 2);
+    attnDate = attnMonth + "/" + attnDay + "/" + attnYear;
+    result = attnDate;
+    resultV.push_back(result);
+  }
+
+  return resultV;
+}
+
+int DBI::ManualInsertUserIntoAttendance(std::string crn, std::string username, std::string attnDate, std::string attnTime)
+{
+  int r{0};
+  std::string statement{};
+  std::string UsersUserID{};
+  std::string EnrollmentUserID{};
+
+  std::string month = attnDate.substr(0, 2);
+  std::string day = attnDate.substr(3, 2);
+  std::string year = attnDate.substr(6, 4);
+
+  std::string timestamp = year + "-" + month + "-" + day + " " + attnTime;
+
+  try
+  {
+    statement = "SELECT `ID` FROM STACDB.Users WHERE `UName` = '" + username + "';";
+    auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+    auto res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+
+    while (res->next())
+    {
+      UsersUserID = res->getString("ID");
+    }
+
+    statement = "SELECT `UserID` FROM STACDB.Enrollment WHERE `ClassID` = '" + crn + "' AND `UserID` = '" + UsersUserID + "' ;";
+    stmt.reset(con->createStatement());
+    res.reset(stmt->executeQuery(statement));
+
+    while (res->next())
+    {
+      EnrollmentUserID = res->getString("UserID");
+    }
+
+    if(UsersUserID != EnrollmentUserID)
+    {
+      r = 1;
+    }
+    else
+    {
+      statement = "INSERT INTO STACDB.Attendance (`UserID`, `ClassID`, `AttnTime`) VALUES('" + UsersUserID + "', '" + crn + "', '" + timestamp + "');";
+      stmt.reset(con->createStatement());
+      stmt->execute(statement);
+    }
+  }
+  catch(sql::SQLException &e)
+  {
+    r = 2;
+    print_sql_error(std::cout, e);
+  }
+
+  return r;
+}
+
+std::vector<std::string> DBI::SelectAttendanceDetailsAdmin(std::string classid)
+{
+  std::vector<std::string> resultV{};
+  std::vector<std::string> resultU{};
+
+  std::string statement{};
+  std::string result{};
+  std::string count{};
+  std::string userID{};
+  std::string username{};
+
+  statement = "SELECT DISTINCT(UserID) FROM STACDB.Attendance WHERE `ClassID` = '" + classid + "';";
+  auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
+  auto res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
+
+  while(res->next())
+  {
+    userID = res->getString("UserID");
+    resultU.push_back(userID);
+  }
+
+  std::for_each(resultU.begin(), resultU.end(),
+    [&](auto const& uid)
+    {
+      statement = "SELECT `UName` FROM STACDB.Users WHERE `ID` = '" + uid + "';";
+      stmt.reset(con->createStatement());
+      res.reset(stmt->executeQuery(statement));
+
+      while(res->next())
+      {
+        username = res->getString("UName");
+      }
+
+      statement = "SELECT COUNT(UserID) FROM STACDB.Attendance where `ClassID` = '" + classid + "' AND `UserID` = '" + uid + "';";
+      stmt.reset(con->createStatement());
+      res.reset(stmt->executeQuery(statement));
+
+      while(res->next())
+      {
+        count = res->getString("COUNT(UserID)");
+        result = username + ";" + count;
+        resultV.push_back(result);
+      }
+    });
+    
+  return resultV;
 }

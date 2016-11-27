@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 #include <boost/optional.hpp>
 
@@ -47,6 +48,7 @@ public:
   int LoginAdmin(std::string uname, std::string password);
   int GetAdminIdFromName(std::string name);
   int GetUserIdFromName(std::string name);
+  boost::optional<std::string> GetUsernameFromID(std::string user_id);
   std::vector<int> SelectClassID(std::string class_name, std::string institution);
   boost::optional<stac::core::Class> SelectClassDetails(int class_id);
   int RemoveUserFromEnrolledClass(std::string crn, std::string username);
@@ -64,6 +66,11 @@ public:
                   std::string ip_address,
                   std::string meetings,
                   int class_id);
+  boost::optional<std::string> GetUserDeviceID(std::string class_id, std::string username);
+  int InsertUserIntoAttendance(std::string crn, std::string username, std::string attnDate, std::string attnTime);
+  std::vector<std::string> SelectAttendanceDetailsUser(std::string classid, std::string username);
+  int ManualInsertUserIntoAttendance(std::string crn, std::string username, std::string attnDate, std::string attnTime);
+  std::vector<std::string> SelectAttendanceDetailsAdmin(std::string classid);
 }; // DBI
 } // db
 } // stac

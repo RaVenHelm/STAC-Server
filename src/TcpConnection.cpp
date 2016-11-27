@@ -373,13 +373,15 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         auto attn_date = values[3];
         auto attn_time = values[4];
 
-        (void)class_id;
-        (void)device_id;
-        (void)attn_date;
-        (void)attn_time;
+        int res{-1};
 
-        // DBI part would go here
-        int res = 0;
+        auto enrolled_device_id = m_dbi->GetUserDeviceID(class_id, m_username);
+
+        if(enrolled_device_id && enrolled_device_id == device_id)
+        {
+          auto timestamp = stac::utility::convert_time(attn_time);
+          res = m_dbi->InsertUserIntoAttendance(class_id, m_username, attn_date, timestamp);
+        }
 
         out_response = builder.user_attend_response(res == 0);
       }
@@ -402,14 +404,15 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
         auto attn_date = values[3];
         auto attn_time = values[4];
 
-        (void)class_id;
-        (void)user_id;
-        (void)attn_date;
-        (void)attn_time;
+        auto timestamp = stac::utility::convert_time(attn_time);
+        auto uname = m_dbi->GetUsernameFromID(user_id);
+        int res{-1};
 
-        // DBI part would go here
-        int res = 0;
-
+        if(uname)
+        {
+          res = m_dbi->ManualInsertUserIntoAttendance(class_id, *uname, attn_date, timestamp);
+        }
+        
         out_response = builder.manual_attend_response(res == 0);
       }
     }
@@ -428,15 +431,16 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       {
         auto class_id = values[1];
 
-        (void)class_id;
+        auto dates = m_dbi->SelectAttendanceDetailsUser(class_id, m_username);
 
-        std::vector<std::string> dates {
-          "07/12/2016",
-          "07/14/2016",
-          "07/16/2016"
-        };
+        boost::optional<std::vector<std::string>> res = boost::none;
 
-        out_response = builder.check_attendance_response(dates);
+        if(!dates.empty())
+        {
+          res = dates;
+        }
+
+        out_response = builder.check_attendance_response(res);
       }
     }
 
@@ -454,15 +458,16 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       {
         auto class_id = values[1];
 
-        std::vector<std::string> aggregate {
-          "131;7",
-          "146;6",
-          "88;2"
-        };
+        auto aggregate = m_dbi->SelectAttendanceDetailsAdmin(class_id);
 
-        (void)class_id;
+        boost::optional<std::vector<std::string>> res = boost::none;
 
-        out_response = builder.check_attendance_response(aggregate);
+        if(!aggregate.empty())
+        {
+          res = aggregate;
+        }
+
+        out_response = builder.check_attendance_response(res);
       }
     }
 

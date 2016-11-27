@@ -56,5 +56,13 @@ namespace stac { namespace utility
     }
     return result;
   }
+
+  std::string convert_time(std::string time_str)
+  {
+    auto hours = time_str.substr(0, 2);
+    auto mins = time_str.substr(2, 2);
+
+    return hours + ":" + mins + ":00";
+  }
 } // utility
 } // stac
