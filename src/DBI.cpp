@@ -311,7 +311,7 @@ boost::optional<std::string> DBI::GetUserDeviceID(std::string class_id, std::str
   auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
   if(res->next())
   {
-    auto id = res->getString("DeviceID");
+    std::string id = res->getString("DeviceID");
     return id;
   }
 
@@ -325,7 +325,7 @@ boost::optional<std::string> DBI::GetUsernameFromID(std::string user_id)
   auto res = std::unique_ptr<sql::ResultSet>(p_stmt->executeQuery());
   if(res->next())
   {
-    auto id = res->getString("UName");
+    std::string id = res->getString("UName");
     return id;
   }
   return boost::none;
