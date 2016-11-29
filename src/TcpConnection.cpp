@@ -375,13 +375,8 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
 
         int res{-1};
 
-        auto enrolled_device_id = m_dbi->GetUserDeviceID(class_id, m_username);
-
-        if(enrolled_device_id && enrolled_device_id == device_id)
-        {
-          auto timestamp = stac::utility::convert_time(attn_time);
-          res = m_dbi->InsertUserIntoAttendance(class_id, m_username, attn_date, timestamp);
-        }
+        auto timestamp = stac::utility::convert_time(attn_time);
+        res = m_dbi->InsertUserIntoAttendance(class_id, m_username, attn_date, timestamp);
 
         out_response = builder.user_attend_response(res == 0);
       }
@@ -400,18 +395,14 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
       else
       {
         auto class_id = values[1];
-        auto user_id = values[2];
+        auto uname = values[2];
         auto attn_date = values[3];
         auto attn_time = values[4];
 
         auto timestamp = stac::utility::convert_time(attn_time);
-        auto uname = m_dbi->GetUsernameFromID(user_id);
         int res{-1};
 
-        if(uname)
-        {
-          res = m_dbi->ManualInsertUserIntoAttendance(class_id, *uname, attn_date, timestamp);
-        }
+        res = m_dbi->ManualInsertUserIntoAttendance(class_id, uname, attn_date, timestamp);
         
         out_response = builder.manual_attend_response(res == 0);
       }
@@ -467,7 +458,7 @@ void TcpConnection::read_complete(boost::system::error_code &error, size_t bytes
           res = aggregate;
         }
 
-        out_response = builder.check_attendance_response(res);
+        out_response = builder.attendance_report_response(res);
       }
     }
 

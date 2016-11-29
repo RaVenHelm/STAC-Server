@@ -419,7 +419,7 @@ std::vector<std::string> DBI::SelectAttendanceDetailsUser(std::string classid, s
     attnYear = attnTime.substr(0, 4);
     attnMonth = attnTime.substr(5, 2);
     attnDay = attnTime.substr(8, 2);
-    attnDate = attnMonth + "/" + attnDay + "/" + attnYear;
+    attnDate = attnMonth + "-" + attnDay + "-" + attnYear;
     result = attnDate;
     resultV.push_back(result);
   }
