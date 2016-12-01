@@ -13,7 +13,7 @@ endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	# TODO: Separate Debug/Release Flags
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wconversion -Wcast-align -Wformat=2 -fno-common -Wstrict-overflow -Wtrampolines -Woverloaded-virtual -Wreorder -Wsign-promo -O3 -ggdb")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wconversion -Wcast-align -Wformat=2 -fno-common -Wstrict-overflow -Wtrampolines -Woverloaded-virtual -Wreorder -Wsign-promo -ggdb")
 	set(STAC_GCC_LIBS dl pthread)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	# Visual Studio settings
