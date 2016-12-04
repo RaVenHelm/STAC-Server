@@ -483,47 +483,20 @@ int DBI::ManualInsertUserIntoAttendance(std::string crn, std::string username, s
 std::vector<std::string> DBI::SelectAttendanceDetailsAdmin(std::string classid)
 {
   std::vector<std::string> resultV{};
-  std::vector<std::string> resultU{};
 
   std::string statement{};
-  std::string result{};
-  std::string count{};
-  std::string userID{};
-  std::string username{};
 
-  statement = "SELECT DISTINCT(UserID) FROM STACDB.Attendance WHERE `ClassID` = '" + classid + "';";
+  statement = "SELECT UserID, COUNT(UserID) FROM Attendance WHERE ClassID=" + classid + " GROUP BY UserID;";
   auto stmt = std::unique_ptr<sql::Statement>(con->createStatement());
   auto res = std::unique_ptr<sql::ResultSet>(stmt->executeQuery(statement));
 
   while(res->next())
   {
-    userID = res->getString("UserID");
-    resultU.push_back(userID);
+    std::string user_id = res->getString("UserID");
+    std::string count = res->getString("COUNT(UserID)");
+
+    resultV.push_back(user_id + "," + count);
   }
 
-  std::for_each(resultU.begin(), resultU.end(),
-    [&](auto const& uid)
-    {
-      statement = "SELECT `UName` FROM STACDB.Users WHERE `ID` = '" + uid + "';";
-      stmt.reset(con->createStatement());
-      res.reset(stmt->executeQuery(statement));
-
-      while(res->next())
-      {
-        username = res->getString("UName");
-      }
-
-      statement = "SELECT COUNT(UserID) FROM STACDB.Attendance where `ClassID` = '" + classid + "' AND `UserID` = '" + uid + "';";
-      stmt.reset(con->createStatement());
-      res.reset(stmt->executeQuery(statement));
-
-      while(res->next())
-      {
-        count = res->getString("COUNT(UserID)");
-        result = username + ";" + count;
-        resultV.push_back(result);
-      }
-    });
-    
   return resultV;
 }
